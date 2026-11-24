@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHP-Basics: Schritt für Schritt zum eigenen Skript</title>
+<style>
+  :root {
+    --bg: #0f1220;
+    --bg-card: #181c2f;
+    --bg-code: #0b0e1a;
+    --accent: #777bb4;
+    --accent-bright: #a8b0f0;
+    --accent-warm: #f0b429;
+    --text: #e8eaf6;
+    --text-dim: #9aa0c3;
+    --success: #2ecc71;
+    --error: #e74c3c;
+    --radius: 14px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Hero ---------- */
+  header {
+    background: linear-gradient(135deg, #232946 0%, #2b2150 60%, #1a1f3d 100%);
+    padding: 70px 0 60px;
+    text-align: center;
+    border-bottom: 3px solid var(--accent);
+  }
+  header .logo { font-size: 3rem; margin-bottom: 10px; }
+  header h1 { font-size: 2.2rem; margin-bottom: 12px; }
+  header h1 span { color: var(--accent-bright); }
+  header p { color: var(--text-dim); font-size: 1.1rem; max-width: 620px; margin: 0 auto; }
+  .badge {
+    display: inline-block; margin-top: 22px; padding: 8px 18px;
+    background: rgba(119,123,180,.18); border: 1px solid var(--accent);
+    border-radius: 999px; color: var(--accent-bright); font-size: .9rem;
+  }
+
+  /* ---------- Themen-Karten ---------- */
+  main { padding: 50px 0 30px; }
+  .intro-text { text-align: center; color: var(--text-dim); max-width: 660px; margin: 0 auto 40px; }
+  .intro-text strong { color: var(--text); }
+  .intro-text code { background: var(--bg-code); padding: 1px 7px; border-radius: 5px; color: var(--accent-bright); }
+
+  .topic {
+    background: var(--bg-card);
+    border: 1px solid #262b4a;
+    border-radius: var(--radius);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .topic-btn {
+    width: 100%; display: flex; align-items: center; gap: 16px;
+    background: none; border: none; cursor: pointer;
+    padding: 20px 24px; text-align: left; color: var(--text);
+    font-size: 1.15rem; font-weight: 600; font-family: inherit;
+    transition: background .2s;
+  }
+  .topic-btn:hover { background: rgba(119,123,180,.08); }
+  .topic-num {
+    flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent); color: #fff; font-size: 1rem; font-weight: 700;
+  }
+  .topic-btn .arrow { margin-left: auto; transition: transform .3s; color: var(--text-dim); }
+  .topic.open .topic-btn .arrow { transform: rotate(180deg); }
+  .topic-body { display: none; padding: 0 28px 26px; }
+  .topic.open .topic-body { display: block; animation: fadeIn .35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .topic-body p { margin-bottom: 14px; color: var(--text); }
+  .topic-body ul { margin: 0 0 16px 22px; }
+  .topic-body li { margin-bottom: 6px; }
+  .topic-body h3 { color: var(--accent-bright); margin: 20px 0 10px; font-size: 1.05rem; }
+  .topic-body code { background: var(--bg-code); padding: 1px 7px; border-radius: 5px; color: var(--accent-bright); }
+
+  /* ---------- Code-Blöcke ---------- */
+  .code-window { border-radius: 10px; overflow: hidden; margin: 16px 0 20px; border: 1px solid #262b4a; }
+  .code-title {
+    background: #1d2340; padding: 8px 14px; font-size: .8rem;
+    color: var(--text-dim); display: flex; align-items: center; gap: 8px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+  }
+  .code-title .dots { display: flex; gap: 5px; }
+  .code-title .dots i { width: 10px; height: 10px; border-radius: 50%; display: block; }
+  .code-title .dots i:nth-child(1) { background: #e74c3c; }
+  .code-title .dots i:nth-child(2) { background: #f0b429; }
+  .code-title .dots i:nth-child(3) { background: #2ecc71; }
+  pre {
+    background: var(--bg-code); padding: 16px 18px; overflow-x: auto;
+    font-family: 'Fira Code', 'Consolas', monospace; font-size: .88rem; line-height: 1.65;
+  }
+  .kw { color: #c792ea; }        /* Keywords */
+  .str { color: #a5e075; }       /* Strings */
+  .var { color: #82aaff; }       /* Variablen */
+  .fn { color: #ffcb6b; }        /* Funktionen */
+  .num { color: #f78c6c; }       /* Zahlen */
+  .cmt { color: #5c6480; font-style: italic; } /* Kommentare */
+  .html-tag { color: #89ddff; }  /* HTML-Tags */
+
+  .merke {
+    background: rgba(240,180,41,.08); border-left: 4px solid var(--accent-warm);
+    padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 18px 0;
+    font-size: .95rem;
+  }
+  .merke b { color: var(--accent-warm); }
+  .achtung {
+    background: rgba(231,76,60,.08); border-left: 4px solid var(--error);
+    padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 18px 0;
+    font-size: .95rem;
+  }
+  .achtung b { color: var(--error); }
+  .aufgabe {
+    background: rgba(46,204,113,.08); border: 1px dashed var(--success);
+    padding: 14px 16px; border-radius: 10px; margin: 18px 0;
+    font-size: .95rem;
+  }
+  .aufgabe b { color: var(--success); }
+
+  .solution-btn {
+    background: none; border: 1px dashed var(--accent); color: var(--accent-bright);
+    padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: .88rem;
+    font-family: inherit; margin: 6px 0 10px; transition: background .2s;
+  }
+  .solution-btn:hover { background: rgba(119,123,180,.15); }
+  .solution { display: none; }
+  .solution.open { display: block; }
+
+  /* ---------- Spickzettel ---------- */
+  .section-title { text-align: center; font-size: 1.6rem; margin: 60px 0 8px; }
+  .section-sub { text-align: center; color: var(--text-dim); margin-bottom: 30px; }
+  .cheat-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: var(--radius); overflow: hidden; }
+  .cheat-table th {
+    background: #232946; padding: 14px 18px; text-align: left;
+    color: var(--accent-bright); font-size: .95rem;
+  }
+  .cheat-table td { padding: 13px 18px; border-top: 1px solid #262b4a; font-size: .93rem; }
+  .cheat-table tr:hover td { background: rgba(119,123,180,.06); }
+  .cheat-table code {
+    font-family: 'Fira Code', 'Consolas', monospace; color: var(--accent-bright);
+    background: var(--bg-code); padding: 2px 8px; border-radius: 5px; white-space: nowrap;
+  }
+
+  /* ---------- Quiz ---------- */
+  .quiz-card {
+    background: var(--bg-card); border: 1px solid #262b4a;
+    border-radius: var(--radius); padding: 30px; margin-top: 20px;
+  }
+  .quiz-progress { height: 8px; background: #262b4a; border-radius: 999px; overflow: hidden; margin-bottom: 8px; }
+  .quiz-progress .bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); width: 0%; transition: width .4s; }
+  .quiz-meta { display: flex; justify-content: space-between; font-size: .85rem; color: var(--text-dim); margin-bottom: 22px; }
+  .quiz-question { font-size: 1.15rem; font-weight: 600; margin-bottom: 20px; }
+  .quiz-code { margin-bottom: 20px; }
+  .answer {
+    display: block; width: 100%; text-align: left; margin-bottom: 10px;
+    padding: 14px 18px; border-radius: 10px; cursor: pointer;
+    background: #1d2240; border: 2px solid #2b3157; color: var(--text);
+    font-size: .98rem; font-family: inherit; transition: all .2s;
+  }
+  .answer:hover { border-color: var(--accent); background: rgba(119,123,180,.12); transform: translateX(4px); }
+  .answer.correct { border-color: var(--success); background: rgba(46,204,113,.12); }
+  .answer.wrong { border-color: var(--error); background: rgba(231,76,60,.12); }
+  .answer:disabled { cursor: default; }
+  .quiz-feedback { display: none; margin-top: 16px; padding: 14px 16px; border-radius: 10px; font-size: .95rem; }
+  .quiz-feedback.ok { display: block; background: rgba(46,204,113,.12); border: 1px solid var(--success); }
+  .quiz-feedback.nope { display: block; background: rgba(231,76,60,.12); border: 1px solid var(--error); }
+  .quiz-next {
+    display: none; margin-top: 18px; padding: 12px 28px; border: none; border-radius: 999px;
+    background: var(--accent); color: #fff; font-size: 1rem; cursor: pointer; font-family: inherit;
+    transition: background .2s;
+  }
+  .quiz-next:hover { background: var(--accent-bright); color: #1a1f3d; }
+  .quiz-result { display: none; text-align: center; padding: 20px 0; }
+  .new-badge { display: inline-block; background: linear-gradient(135deg, #e8613c, #f7b32b); color: #fff;
+    font-size: .68rem; font-weight: 800; letter-spacing: .5px; border-radius: 20px; padding: 3px 10px;
+    margin-right: 10px; vertical-align: middle; box-shadow: 0 2px 8px rgba(247,179,43,.35); }
+  .quiz-start-btns .quiz-next { display: inline-block; }
+  #quizStart { text-align: center; padding: 26px 10px 14px; }
+  #quizStart p { color: var(--text-dim); margin-bottom: 18px; }
+  .quiz-start-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .quiz-start-btns .quiz-next:disabled { opacity: .45; cursor: not-allowed; }
+  #progressLine { color: var(--text-dim); font-size: .95rem; margin: 14px 0 4px; }
+  .quiz-reset { background: none; border: none; color: var(--text-dim); font-size: .8rem;
+    text-decoration: underline; cursor: pointer; padding: 6px; }
+  .quiz-result .emoji { font-size: 3rem; margin-bottom: 10px; }
+  .quiz-result h3 { font-size: 1.5rem; margin-bottom: 8px; }
+  .quiz-result .score { font-size: 2rem; font-weight: 700; color: var(--accent-bright); margin: 12px 0; }
+  .quiz-result p { color: var(--text-dim); margin-bottom: 22px; }
+  .quiz-restart {
+    padding: 12px 28px; border: 2px solid var(--accent); background: none; border-radius: 999px;
+    color: var(--accent-bright); font-size: 1rem; cursor: pointer; font-family: inherit;
+  }
+  .quiz-restart:hover { background: rgba(119,123,180,.15); }
+
+  footer {
+    margin-top: 70px; padding: 26px 0; text-align: center;
+    color: var(--text-dim); font-size: .85rem; border-top: 1px solid #262b4a;
+  }
+  footer code { color: var(--accent-bright); }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.6rem; }
+    .topic-btn { font-size: 1rem; padding: 16px 16px; }
+    .topic-body { padding: 0 16px 22px; }
+    .quiz-card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="logo">🐘</div>
+    <h1>Hallo <span>PHP-Entwickler:in</span>! 👋</h1>
+    <p>Hier lernst du Schritt für Schritt, wie du mit PHP dynamische Webseiten erstellst –
+       von der ersten Ausgabe bis zur eigenen Schleife im HTML. Klicke auf ein Thema, um loszulegen!</p>
+    <span class="badge">💻 Die Nummern entsprechen unseren Unterrichtsdateien (01–12)</span>
+  </div>
+</header>
+
+<main class="container">
+
+  <p class="intro-text">
+    PHP läuft auf dem <strong>Server</strong> und erzeugt HTML, das im Browser ankommt.
+    Während HTML nur <strong>statisch</strong> ist (jeder sieht dasselbe), kann PHP Inhalte
+    <strong>dynamisch</strong> berechnen. Die Themen hier folgen genau unseren Unterrichtsdateien <code>01_helloworld.php</code> bis <code>11_zufallszahlen.php</code> – plus den drei Cookie-Dateien im Ordner <code>12_cookies</code>
+  </p>
+
+  <section class="topic" id="thema1">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">01</span>
+      Erste Ausgabe: echo &amp; Kommentare
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Dein PHP-Skript beginnt mit <code>&lt;?php</code> – ab hier wird Code ausgeführt. Mit <code>echo</code> gibst du Text aus, und mit Kommentaren dokumentierst du dein Programm für dich und andere.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 01_helloworld.php</div>
+<pre><span class="cmt">&lt;!-- HTML Kommentar --&gt;</span>
+<span class="kw">&lt;?php</span>
+<span class="cmt">// 01_helloworld.php</span>
+
+<span class="cmt">// einzeiliger Kommentar</span>
+
+<span class="cmt">/*</span>
+<span class="cmt">mehrzeiliger</span>
+<span class="cmt">Kommentar</span>
+<span class="cmt">*/</span>
+
+<span class="cmt">// Ausgabe in PHP</span>
+<span class="fn">echo</span> <span class="str">"Hello World!"</span>;
+<span class="fn">echo</span> <span class="str">"&lt;br&gt;"</span>;
+<span class="fn">echo</span> <span class="str">"Jippie.."</span>;
+
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li><code>echo</code> gibt alles aus, was in den Anführungszeichen steht</li>
+        <li>HTML-Tags funktionieren <strong>im String</strong>: <code>"&lt;br&gt;"</code> erzeugt einen echten Zeilenumbruch im Browser</li>
+        <li>Es gibt <strong>zwei Kommentar-Arten</strong>: <code>&lt;!-- HTML-Kommentar --&gt;</code> gilt für die ganze Datei, <code>//</code> und <code>/* */</code> nur innerhalb des PHP-Blocks</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Jede Anweisung endet mit einem <b>Semikolon (;)</b>. Vergisst du es, gibt PHP einen Parse Error – der häufigste Anfängerfehler!</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Erstelle eine Datei <code>01_helloworld.php</code> und gib deinen eigenen Namen mit <code>echo</code> aus – einmal normal und einmal <strong>fett</strong>.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema2">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">02</span>
+      PHP &amp; HTML kombinieren
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>PHP lebt <strong>mitten im HTML</strong>: Überall, wo dynamischer Inhalt gebraucht wird, öffnest du kurz den PHP-Block, gibst etwas aus – und der Browser bekommt fertiges HTML.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 02_html.php</div>
+<pre><span class="html-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="html-tag">&lt;html lang="en"&gt;</span>
+<span class="html-tag">&lt;head&gt;</span>
+    <span class="html-tag">&lt;meta charset="UTF-8"&gt;</span>
+    <span class="html-tag">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>
+    <span class="html-tag">&lt;title&gt;</span>HTML &amp; PHP<span class="html-tag">&lt;/title&gt;</span>
+<span class="html-tag">&lt;/head&gt;</span>
+<span class="html-tag">&lt;body&gt;</span>
+    <span class="html-tag">&lt;h1&gt;</span>Willkommen <span class="kw">&lt;?php</span> <span class="fn">echo</span> <span class="str">"Gertrud"</span>; <span class="kw">?&gt;</span><span class="html-tag">&lt;/h1&gt;</span>
+    <span class="html-tag">&lt;p&gt;</span><span class="kw">&lt;?php</span> <span class="fn">echo</span> <span class="str">"Ich bin ein &lt;b&gt;Absatztext&lt;/b&gt;..."</span>;<span class="kw">?&gt;</span><span class="html-tag">&lt;/p&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li><code>&lt;?php ... ?&gt;</code> kann <strong>beliebig oft</strong> mitten im HTML geöffnet und geschlossen werden</li>
+        <li>Der Browser sieht nur das <strong>Ergebnis</strong> – im Seitenquelltext steht kein PHP mehr</li>
+        <li>Auch HTML-Tags wie <code>&lt;b&gt;...&lt;/b&gt;</code> dürfen im echo-String stehen</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Der Server ersetzt die PHP-Blöcke durch ihre Ausgabe – <em>dann erst</em> wird die Seite an den Browser geschickt. Im Browser angekommen ist alles nur noch HTML.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Baue eine eigene Seite <code>02_html.php</code> mit Überschrift, Absatz und deinem Namen per <code>echo</code> im HTML.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema3">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">03</span>
+      Variablen – das Gedächtnis deines Skripts
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Variablen speichern Werte, die du später wieder verwenden oder verändern kannst. Jede Variable beginnt mit einem <strong>$-Zeichen</strong>.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 03_variablen.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// 03_variablen.php</span>
+
+<span class="cmt">// Variablen in PHP beginnen mit $</span>
+
+<span class="var">$text</span> = <span class="str">"Hallo PHP"</span>; <span class="cmt">// string</span>
+<span class="var">$zahl</span> = <span class="num">5</span>; <span class="cmt">// integer</span>
+<span class="var">$komma</span> = <span class="num">4.5</span>; <span class="cmt">// float</span>
+<span class="var">$boolean</span> = <span class="kw">true</span>; <span class="cmt">// boolean</span>
+
+<span class="cmt">// Ausgabe einer Variable einfach im echo</span>
+<span class="fn">echo</span> <span class="str">"Die Variable zahl hat den Wert $zahl"</span>;
+
+<span class="cmt">// geht aber auch mit Verknuepfung (Punkt)</span>
+<span class="fn">echo</span> <span class="str">"&lt;br&gt;Die Variable text hat den Wert: "</span>.<span class="var">$text</span>;
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li>Die Datentypen: <strong>string</strong> (Text), <strong>integer</strong> (ganze Zahl), <strong>float</strong> (Kommazahl <strong>mit Punkt</strong>: 4.5!), <strong>boolean</strong> (true/false)</li>
+        <li>Zwei Wege der Ausgabe: die Variable <strong>direkt in den String einbetten</strong> (<code>"Wert $zahl"</code>) oder mit <strong>Punkt verknüpfen</strong> (<code>"Wert: ".$text</code>)</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Kommazahlen schreibt man mit <strong>Punkt</strong>: <code>$komma = 4.5;</code> – nicht <code>4,5</code>. Mit Komma gibt es eine Fehlermeldung!</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Lege Variablen für deinen Namen und dein Geburtsjahr an und gib einen schönen Begrüßungssatz aus – einmal eingebettet, einmal mit Punkt verknüpft.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema4">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">04</span>
+      Die for-Schleife
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Möchtest du etwas 10-mal wiederholen? Schreibst du 10 Zeilen? Nein – dafür gibt es die <strong>for-Schleife</strong>. Sie hat genau drei Parameter:</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 04_schleife.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// 04_schleife.php</span>
+
+<span class="cmt">// FOR Schleife</span>
+<span class="cmt">// 1. Parameter: Startwert (wo zaehlt die Schleife los?)</span>
+<span class="cmt">// 2. Parameter: Abbruchbedingung (wann hoert die Schleife auf?)</span>
+<span class="cmt">// 3. Parameter: Schrittweite (wie zaehlt die Schleife weiter?)</span>
+<span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">10</span>; <span class="var">$i</span>++) {
+    <span class="fn">echo</span> <span class="str">"FOR Schleife... $i"</span>;
+    <span class="fn">echo</span> <span class="str">"&lt;br&gt;"</span>;
+}
+
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Die drei Parameter im Detail</h3>
+      <ul>
+        <li><strong>Startwert:</strong> <code>$i=1</code> – die Zählvariable beginnt bei 1</li>
+        <li><strong>Abbruchbedingung:</strong> <code>$i&lt;=10</code> – läuft, solange $i kleiner oder gleich 10 ist</li>
+        <li><strong>Schrittweite:</strong> <code>$i++</code> – erhöht $i nach jedem Durchlauf um 1</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> <code>$i++</code> ist die Kurzform von <code>$i = $i + 1</code>. Die Variable <code>$i</code> nennt man <strong>Iterator</strong> oder Zählvariable.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Schreibe eine Schleife, die von 1 bis 20 zählt. Tipp: Nur die Abbruchbedingung ändern!</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema5">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">05</span>
+      Schleifen + HTML: Listen generieren
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Jetzt kombinieren wir alles: Die Schleife läuft auf dem Server und <strong>erzeugt HTML</strong> – aus 3 Zeilen PHP wird eine Liste mit 12 Einträgen!</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 05_htmlschleife.php</div>
+<pre><span class="html-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="html-tag">&lt;html lang="en"&gt;</span>
+<span class="html-tag">&lt;head&gt;</span>
+    <span class="html-tag">&lt;meta charset="UTF-8"&gt;</span>
+    <span class="html-tag">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>
+    <span class="html-tag">&lt;title&gt;</span>HTML Schleife<span class="html-tag">&lt;/title&gt;</span>
+<span class="html-tag">&lt;/head&gt;</span>
+<span class="html-tag">&lt;body&gt;</span>
+    <span class="html-tag">&lt;h1&gt;</span>HTML Schleife<span class="html-tag">&lt;/h1&gt;</span>
+    <span class="html-tag">&lt;ul&gt;</span>
+    <span class="kw">&lt;?php</span>
+        <span class="kw">for</span> (<span class="var">$mimi</span>=<span class="num">1</span>; <span class="var">$mimi</span>&lt;=<span class="num">12</span>; <span class="var">$mimi</span>++) {
+            <span class="fn">echo</span> <span class="str">"&lt;li&gt;Mimimimi&lt;/li&gt;"</span>;
+        }
+    <span class="kw">?&gt;</span>
+    <span class="html-tag">&lt;/ul&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was hier passiert (Schritt für Schritt)</h3>
+      <ul>
+        <li>Der Browser lädt die Seite → der Server führt den PHP-Block zwischen <code>&lt;?php</code> und <code>?&gt;</code> aus</li>
+        <li>Die Schleife läuft 12-mal und erzeugt jedes Mal ein <code>&lt;li&gt;</code>-Element</li>
+        <li>Der Browser erhält am Ende <strong>12 fertige Listeneinträge</strong> – ohne dass wir 12 Zeilen tippen</li>
+        <li>Die Zählvariable muss <strong>nicht</strong> <code>$i</code> heißen – hier heißt sie <code>$mimi</code>. Der Name ist egal, gezählt wird genauso!</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Das ist das Grundprinzip dynamischer Webseiten: PHP <strong>erzeugt</strong> HTML – aus Daten, aus Berechnungen, aus Schleifen. Statt 20 Zeilen tippen: 3 Zeilen PHP!</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Lasse die Schleife von 1 bis 20 laufen und nummeriere die Einträge: <code>"&lt;li&gt;Besucher Nr. $mimi&lt;/li&gt;"</code>.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema6">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">06</span>
+      Verzweigungen: if / else if / else
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Dein Programm soll entscheiden können – je nach Wert einer Variable. Dafür gibt es die <strong>Abfrage</strong> (auch Verzweigung genannt) mit <code>if</code>, <code>else if</code> und <code>else</code>.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 06_abfrage.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// 06_abfrage.php</span>
+
+<span class="var">$alter</span> = <span class="num">18</span>;
+
+<span class="kw">if</span> (<span class="var">$alter</span> &lt; <span class="num">16</span>) {
+    <span class="fn">echo</span> <span class="str">"Nein, du bleibst draußen."</span>;
+}
+<span class="kw">else</span> <span class="kw">if</span> (<span class="var">$alter</span> &lt;= <span class="num">18</span>) {
+    <span class="fn">echo</span> <span class="str">"Du darfst rein, aber keine harten Drinks"</span>;
+}
+<span class="kw">else</span> <span class="kw">if</span> (<span class="var">$alter</span> == <span class="num">20</span>) {
+    <span class="fn">echo</span> <span class="str">"Willkommens-Shot inklusive"</span>;
+}
+<span class="kw">else</span> {
+    <span class="fn">echo</span> <span class="str">"Ja, komm rein."</span>;
+}
+
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li>PHP prüft die Bedingungen <strong>von oben nach unten</strong> – die <strong>erste</strong> wahre Bedingung gewinnt, der Rest wird übersprungen</li>
+        <li>Mit <code>$alter = 18</code>: <code>18 &lt; 16</code> ist falsch → weiter; <code>18 &lt;= 18</code> ist wahr → Ausgabe „Du darfst rein, aber keine harten Drinks“</li>
+        <li><code>else</code> ist der <strong>Notausgang</strong>: es greift, wenn keine Bedingung stimmt</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Die Reihenfolge ist entscheidend! Prüfe immer von <strong>eng</strong> nach <strong>weit</strong> – hier ist das schon eingebaut: erst <code>&lt; 16</code>, dann <code>&lt;= 18</code>, dann <code>== 20</code>. Schreibst du umgekehrt zuerst <code>&lt;= 18</code>, würde die 16-Jahrige nie „draußen“ bleiben.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Schreibe eine Noten-Abfrage: Bei einer Variable <code>$note</code> soll „Sehr gut“ (1), „Gut“ (2), „Bestanden“ (3–4) oder „Nicht bestanden“ (5–6) ausgegeben werden.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema7">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">07</span>
+      Formulare: Daten mit POST empfangen
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Jetzt wird es spannend: Die <strong>Benutzer:in</strong> gibt etwas ein – und dein PHP-Skript reagiert darauf. Das HTML-Formular schickt seine Daten an denselben Server, der sie in der Superglobalen <code>$_POST</code> ablegt.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 07_formular.php</div>
+<pre><span class="html-tag">&lt;form method="post"&gt;</span>
+    <span class="html-tag">&lt;input name="eingabe" placeholder="Gib was ein"&gt;</span>
+    <span class="html-tag">&lt;input name="alter" placeholder="Alter" type="number"&gt;</span>
+    <span class="html-tag">&lt;button&gt;</span>Send it!<span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span>
+
+<span class="kw">&lt;?php</span>
+<span class="cmt">// Ein Formular "auslesen"</span>
+<span class="cmt">// Formularmethode: post</span>
+
+<span class="kw">if</span> (<span class="var">$_POST</span>) { <span class="cmt">// nur wenn ueberhaupt ein Formular abgeschickt wurde</span>
+
+    <span class="fn">echo</span> <span class="var">$_POST</span>[<span class="str">"eingabe"</span>];
+    <span class="fn">echo</span> <span class="str">"&lt;br&gt;"</span>;
+
+    <span class="kw">if</span> (<span class="var">$_POST</span>[<span class="str">"alter"</span>]) { <span class="cmt">// ueberpruefen, ob das Feld ausgefuellt wurde</span>
+        <span class="fn">echo</span> <span class="var">$_POST</span>[<span class="str">"alter"</span>];
+    }
+    <span class="kw">else</span> {
+        <span class="fn">echo</span> <span class="str">"kein Alter angegeben"</span>;
+    }
+}
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li>Jedes <code>&lt;input&gt;</code> mit einem <strong>name-Attribut</strong> landet nach dem Abschicken in <code>$_POST["name"]</code></li>
+        <li><code>if ($_POST)</code> ist die Kurzprüfung „wurde überhaupt ein Formular abgeschickt?“ – beim ersten Seitenaufruf ist das noch nicht der Fall!</li>
+        <li><strong>Verschachtelte Abfragen:</strong> Innerhalb des <code>if ($_POST)</code> prüft ein zweites <code>if ($_POST["alter"])</code>, ob das Feld überhaupt ausgefüllt wurde – sonst kommt „kein Alter angegeben“</li>
+        <li><code>method="post"</code> im Formular legt fest: die Daten reisen <strong>unsichtbar</strong> im Request</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Formular und PHP stehen in <strong>derselben Datei</strong> – die Seite schickt die Daten an sich selbst. Beim allerersten Aufruf ist <code>$_POST</code> noch leer, erst nach dem Klick auf „Send it!“ sind die Daten da.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Erweitere das Formular um ein Feld für „Wohnort“ und gib einen vollständigen Satz aus, z. B. „Du heißt ..., bist ... Jahre alt und wohnst in ...“.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema8">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">08</span>
+      Formulare: GET &amp; der Unterschied zu POST
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Derselbe Ablauf wie in Lektion 07 – nur mit <code>method="get"</code>. Der wichtigste Unterschied: Bei GET landen die Eingaben <strong>sichtbar in der URL</strong>.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 08_formular-get.php</div>
+<pre><span class="html-tag">&lt;form method="get"&gt;</span>
+    <span class="html-tag">&lt;input name="eingabe" placeholder="Gib was ein"&gt;</span>
+    <span class="html-tag">&lt;input name="alter" placeholder="Alter" type="number"&gt;</span>
+    <span class="html-tag">&lt;button&gt;</span>Send it!<span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span>
+
+<span class="kw">&lt;?php</span>
+<span class="cmt">// Ein Formular "auslesen"</span>
+<span class="cmt">// Formularmethode: get</span>
+
+<span class="fn">echo</span> <span class="var">$_GET</span>[<span class="str">"eingabe"</span>];
+<span class="fn">echo</span> <span class="str">"&lt;br&gt;"</span>;
+<span class="fn">echo</span> <span class="var">$_GET</span>[<span class="str">"alter"</span>];
+
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <p>Nach dem Abschicken ("Send it!") sieht die Adressleiste so aus:</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> URL nach dem Abschicken</div>
+<pre>.../08_formular-get.php?eingabe=Hallo&amp;alter=17</pre>
+      </div>
+
+      <h3>🔍 GET oder POST – wann was?</h3>
+      <ul>
+        <li><strong>GET:</strong> Daten stehen in der URL – gut für Suchen und Filter, man kann die Seite <strong>verlinken und als Lesezeichen speichern</strong>. <em>Nicht</em> für Passwörter!</li>
+        <li><strong>POST:</strong> Daten reisen unsichtbar im Request – gut für Passwörter und sensible Angaben</li>
+        <li>In PHP liest du GET-Daten mit <code>$_GET["eingabe"]</code> statt <code>$_POST["eingabe"]</code> aus – sonst gäbe es eine Fehlermeldung</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> In der URL erkennst du GET-Formulare am <strong>Fragezeichen</strong>: alles dahinter sind Name-Wert-Paare, getrennt durch <strong>&amp;</strong>. Ruf die URL doch mal direkt mit eigenen Werten auf – ganz ohne Formular!</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Ändere dein Noten-Abfrage-Programm: Die Note soll über ein GET-Formular eingegeben werden und die Ausgabe erscheint darunter.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema9">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">09</span>
+      Formular + HTML: isset() &amp; Validierung
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Jetzt bauen wir alles zusammen: ein vollständiges HTML-Dokument mit Formular – und eine <strong>saubere Prüfung</strong>, ob überhaupt etwas gesendet wurde. Dafür sorgt <code>isset()</code>.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 09_formular-html.php</div>
+<pre><span class="html-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="html-tag">&lt;html lang="en"&gt;</span>
+<span class="html-tag">&lt;head&gt;</span>
+    <span class="html-tag">&lt;meta charset="UTF-8"&gt;</span>
+    <span class="html-tag">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>
+    <span class="html-tag">&lt;title&gt;</span>Formular mit HTML<span class="html-tag">&lt;/title&gt;</span>
+<span class="html-tag">&lt;/head&gt;</span>
+<span class="html-tag">&lt;body&gt;</span>
+    <span class="html-tag">&lt;h1&gt;</span>E-Mail check<span class="html-tag">&lt;/h1&gt;</span>
+    <span class="html-tag">&lt;form method="post"&gt;</span>
+        <span class="html-tag">&lt;input name="email" type="email" placeholder="E-Mail"&gt;</span>
+        <span class="html-tag">&lt;button type="submit"&gt;</span>Überprüfen<span class="html-tag">&lt;/button&gt;</span>
+    <span class="html-tag">&lt;/form&gt;</span>
+    <span class="html-tag">&lt;p&gt;</span>
+    <span class="kw">&lt;?php</span>
+        <span class="kw">if</span> ( <span class="fn">isset</span>(<span class="var">$_POST</span>[<span class="str">"email"</span>]) ) {
+            <span class="var">$email</span> = <span class="var">$_POST</span>[<span class="str">"email"</span>];
+            <span class="fn">echo</span> <span class="str">"Deine E-Mail $email ist gueltig"</span>;
+        }
+    <span class="kw">?&gt;</span>
+    <span class="html-tag">&lt;/p&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li><code>isset($_POST["email"])</code> prüft: <strong>Existiert dieses Feld</strong> – wurde es also abgeschickt? So vermeidest du Warnungen beim ersten Seitenaufruf</li>
+        <li><code>type="email"</code> lässt den Browser selbst prüfen, ob eine gültige E-Mail-Adresse eingegeben wurde</li>
+        <li>Die Ausgabe steht <strong>genau dort im HTML</strong>, wo der PHP-Block ist – hier im <code>&lt;p&gt;</code>-Element</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Das ist das professionelle Muster für fast jede Formular-Seite: <strong>Formular oben, <code>if (isset(...))</code> darunter</strong> – erst prüfen, dann verarbeiten.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Baue einen „Login-Check“: Felder für Benutzername und Passwort (POST!). Mit <code>isset()</code> prüfst du, ob beide abgeschickt wurden – wenn ja: „Willkommen!“</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema10">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">10</span>
+      Formular vorausfüllen: Radio &amp; Prefill
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Ein echtes Formular hat mehr als ein Textfeld: <strong>Radio-Buttons</strong> für Auswahlmöglichkeiten – und nach dem Abschicken bleiben die Eingaben dank <strong>PHP-Prefill</strong> erhalten.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 10_formular-prefill.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// 10_formular-prefill.php</span>
+
+<span class="kw">if</span> (<span class="var">$_POST</span>) { <span class="cmt">// &lt;- prüft, ob ein Formular abgeschickt ist</span>
+    <span class="var">$eingabe</span> = <span class="var">$_POST</span>[<span class="str">"eingabe"</span>];
+    <span class="fn">echo</span> <span class="str">"Deine Eingabe: $eingabe"</span>;
+
+    <span class="var">$hobby</span> = <span class="var">$_POST</span>[<span class="str">"hobby"</span>];
+    <span class="fn">echo</span> <span class="str">"&lt;br&gt;Dein Hobby: $hobby"</span>;
+}
+<span class="kw">?&gt;</span>
+
+<span class="html-tag">&lt;form method="post"&gt;</span>
+    <span class="html-tag">&lt;input name="eingabe" placeholder="Gib was ein" value="</span><span class="kw">&lt;?php</span> <span class="fn">echo</span> <span class="var">$eingabe</span>;<span class="kw">?&gt;</span>"&gt;
+
+    <span class="html-tag">&lt;input type="radio" name="hobby" value="Reiten"&gt;</span>Reiten
+    <span class="html-tag">&lt;input type="radio" name="hobby" value="Turnen"&gt;</span>Turnen
+
+    <span class="html-tag">&lt;button&gt;</span>Abschicken<span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li><code>if ($_POST)</code> ist die Kurzform von „wurde irgendwas per POST geschickt?“ – wie <code>isset()</code> in Lektion 09, nur kürzer</li>
+        <li><strong>Prefill:</strong> <code>value="&lt;?php echo $eingabe;?&gt;"</code> schreibt die alte Eingabe zurück ins Feld – der Name bleibt nach dem Abschicken stehen</li>
+        <li><strong>Radio-Buttons mit gleichem name</strong> bilden eine Gruppe – nur eine Option wählbar, ihr <code>value</code> landet in <code>$_POST["hobby"]</code></li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Das <strong>name-Attribut</strong> entscheidet alles: gleiches name = gleiche Gruppe (Radio), und unter genau diesem name findest du den Wert in <code>$_POST</code>.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Ergänze eine eigene Radio-Gruppe (z. B. Lieblingsfach) und fülle das Textfeld nach dem Abschicken wieder vor.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema11">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">11</span>
+      Zufallszahlen mit rand()
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Mit <code>rand()</code> erzeugt PHP Zufallszahlen – die Basis für Spiele, Zufallsbilder und Überraschungen auf der Webseite.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 11_zufallszahlen.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// 11_zufallszahlen.php</span>
+
+<span class="cmt">// Zufallszahlen in PHP mit rand(MIN, MAX)</span>
+
+<span class="var">$zuza1</span> = <span class="fn">rand</span>();
+<span class="fn">echo</span> <span class="str">"Zufallszahl1: $zuza1"</span>;
+<span class="fn">echo</span> <span class="str">"&lt;br&gt;"</span>;
+
+<span class="var">$zuza2</span> = <span class="fn">rand</span>(<span class="num">1</span>, <span class="num">100</span>);
+<span class="fn">echo</span> <span class="str">"Zufallszahl2: $zuza2"</span>;
+
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li><code>rand()</code> ohne Parameter: eine große, beliebige Zufallszahl</li>
+        <li><code>rand(1, 100)</code>: eine Zufallszahl <strong>zwischen 1 und 100</strong> (beide Grenzen sind erlaubt)</li>
+        <li>Bei jedem Seitenaufruf kommt eine <strong>neue</strong> Zahl – genau so funktioniert das Zahlenraten weiter unten!</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> <code>rand(MIN, MAX)</code> liefert eine ganze Zufallszahl inklusive beider Grenzen – ein Würfel wäre <code>rand(1, 6)</code>.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Simuliere einen Würfel: Gib bei jedem Aufruf eine zufällige Zahl von 1 bis 6 aus.</div>
+    </div>
+  </section>
+
+  <section class="topic" id="thema12">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">12</span>
+      Cookies: setcookie, $_COOKIE &amp; löschen
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Neu im Unterricht:</strong> Cookies! Ein Cookie ist eine kleine Information, die PHP im Browser der Besucherin speichert – und die bei jedem weiteren Seitenaufruf automatisch mitgeschickt wird. Damit kann sich eine Seite an dich „erinnern“. Die drei Dateien liegen bei uns im Ordner <code>12_cookies</code>.</p>
+
+      <p><strong>Schritt 1 – ein Cookie setzen</strong> (<code>cookies_1.php</code>):</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 12_cookies/cookies_1.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// cookies_1.php</span>
+
+<span class="cmt">// Cookie erstellen ("setzen"): 3 Parameter</span>
+<span class="cmt">// 1. Parameter: Name des Cookies</span>
+<span class="cmt">// 2. Parameter: Wert des Cookies</span>
+<span class="cmt">// 3. Parameter: Ablaufdatum - aktuelle Zeit PLUS Sekunden</span>
+
+<span class="fn">setcookie</span>(<span class="str">"username"</span>, <span class="str">"sepp"</span>, <span class="fn">time</span>()+<span class="num">45</span> );
+
+<span class="fn">echo</span> <span class="str">"Cookie wurde erzeugt"</span>;
+
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <p><strong>Schritt 2 – ein Cookie auslesen</strong> (<code>cookies_2.php</code>) – lade die Seite danach mehrmals neu:</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 12_cookies/cookies_2.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// cookies_2.php</span>
+
+<span class="cmt">// Cookie auslesen (gibt es ein bestimmtes Cookie?)</span>
+<span class="cmt">// Prüfen ob ein Cookie existiert: isset</span>
+
+<span class="kw">if</span> ( <span class="fn">isset</span>(<span class="var">$_COOKIE</span>[<span class="str">"username"</span>]) ) {
+    <span class="fn">echo</span> <span class="var">$_COOKIE</span>[<span class="str">"username"</span>];
+}
+<span class="kw">else</span> {
+    <span class="fn">echo</span> <span class="str">"Kein Cookie username gefunden."</span>;
+}
+
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <p><strong>Schritt 3 – ein Cookie löschen</strong> (<code>cookies_3.php</code>):</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 12_cookies/cookies_3.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// cookies_3.php</span>
+
+<span class="cmt">// Cookie wieder löschen</span>
+<span class="cmt">// man verwendet wieder setcookie mit folgenden Parametern</span>
+<span class="cmt">// 1. Parameter: Name des Cookie</span>
+<span class="cmt">// 2. Parameter: LEER lassen</span>
+<span class="cmt">// 3. Parameter: Zeit in Vergangenheit</span>
+
+<span class="fn">setcookie</span>(<span class="str">"username"</span>, <span class="str">""</span>, <span class="fn">time</span>()-<span class="num">100</span>);
+
+<span class="fn">echo</span> <span class="str">"Cookie gelöscht"</span>;
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li><code>setcookie(NAME, WERT, time()+SEKUNDEN)</code> setzt ein Cookie – mit Name, Wert und <strong>Ablaufzeit</strong></li>
+        <li>Auslesen wie bei Formularen über die Superglobale <code>$_COOKIE["name"]</code> – vorhanden? Das prüfst du mit <code>isset()</code> (Lektion 09!)</li>
+        <li>Löschen geht wieder mit <code>setcookie()</code>: <strong>leerer Wert + Zeit in der Vergangenheit</strong> (<code>time()-100</code>)</li>
+        <li>Cookies sind überlebensnotwendig für Logins, Warenkörbe – und die Übungen <strong>besuchszaehler.php</strong> und <strong>UE_09 Lieblingsfarbe</strong> weiter unten</li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Das Ablaufdatum ist <strong>aktuelle Zeit PLUS Sekunden</strong>: <code>time()+45</code> heißt „gilt 45 Sekunden“ (cookies_1.php), <code>time()+120</code> „gilt 2 Minuten“ (besuchszaehler &amp; Lieblingsfarbe). Nach dem Ablaufdatum löscht der Browser das Cookie von selbst.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Probiere es aus: Führe cookies_1.php aus, dann sofort cookies_2.php – und danach noch einmal nach einer Minute. Was zeigt cookies_2.php an, wenn das Cookie (45 Sekunden!) abgelaufen ist?</div>
+    </div>
+  </section>
+
+  <!-- ============ SPICKZETTEL ============ -->
+  <h2 class="section-title">📋 PHP-Spickzettel</h2>
+  <p class="section-sub">Die wichtigsten Befehle aus den Lektionen 01–12 inklusive Cookies – zum Lernen und Nachschlagen.</p>
+
+  <table class="cheat-table">
+    <tr><th>Syntax</th><th>Bedeutung</th></tr>
+    <tr><td><code>&lt;?php ... ?&gt;</code></td><td>PHP-Block im HTML öffnen und schließen</td></tr>
+    <tr><td><code>echo "Text";</code></td><td>Text im Browser ausgeben</td></tr>
+    <tr><td><code>//</code> bzw. <code>/* ... */</code></td><td>Einzeiliger / mehrzeiliger Kommentar</td></tr>
+    <tr><td><code>$name = "Fritz";</code></td><td>Variable definieren (mit $-Zeichen)</td></tr>
+    <tr><td><code>"Wert: " . $zahl</code></td><td>Strings und Variablen mit Punkt verknüpfen</td></tr>
+    <tr><td><code>"Willkommen $name"</code></td><td>Variable direkt im String einbetten</td></tr>
+    <tr><td><code>$zahl = 9; / $komma = 4.5;</code></td><td>integer (ganze Zahl) / float (mit Punkt!)</td></tr>
+    <tr><td><code>for ($i=1; $i&lt;=10; $i++)</code></td><td>Schleife: Start; Abbruchbedingung; Schrittweite</td></tr>
+    <tr><td><code>$i++</code></td><td>Zählvariable um 1 erhöhen (= $i = $i + 1)</td></tr>
+    <tr><td><code>echo "&lt;li&gt;$i&lt;/li&gt;"</code></td><td>HTML in einer Schleife generieren</td></tr>
+    <tr><td><code>if (...) { } else if (...) { } else { }</code></td><td>Abfrage / Verzweigung – erste wahre Bedingung gewinnt</td></tr>
+    <tr><td><code>&gt; &lt; &gt;= &lt;= == !=</code></td><td>Vergleichsoperatoren für Bedingungen</td></tr>
+    <tr><td><code>&lt;form method="post"&gt;</code></td><td>HTML-Formular, Daten reisen unsichtbar</td></tr>
+    <tr><td><code>&lt;form method="get"&gt;</code></td><td>Daten landen sichtbar in der URL (?name=wert&name2=wert2)</td></tr>
+    <tr><td><code>$_POST['feld'] / $_GET['feld']</code></td><td>Formulardaten empfangen (name-Attribut!)</td></tr>
+    <tr><td><code>isset($_POST['feld'])</code></td><td>Prüfen, ob ein Feld abgeschickt wurde (Existenz)</td></tr>
+    <tr><td><code>required</code></td><td>HTML: Feld muss ausgefüllt sein</td></tr>
+    <tr><td><code>rand(3, 20)</code></td><td>Zufallszahl zwischen 3 und 20 (auch rand(1, 100) ...)</td></tr>
+    <tr><td><code>$i % 2</code></td><td>Modulo (Rest der Division) – gerade: 0, ungerade: 1</td></tr>
+    <tr><td><code>&lt;input type="radio" name="x"&gt;</code></td><td>Auswahl: gleiches name = eine Gruppe, nur eine wählbar</td></tr>
+    <tr><td><code>value="&lt;?php echo $var;?&gt;"</code></td><td>Formularfeld nach dem Abschicken vorausfüllen (Prefill)</td></tr>
+    <tr><td><code>if ($_POST) / if ($_GET)</code></td><td>Kurzprüfung: wurde das Formular abgeschickt?</td></tr>
+    <tr><td><code>setcookie("name", "wert", time()+60)</code></td><td>Cookie setzen: Name, Wert, Ablauf (Sekunden ab jetzt)</td></tr>
+    <tr><td><code>$_COOKIE["name"]</code></td><td>Cookie auslesen – Superglobale wie $_POST / $_GET</td></tr>
+    <tr><td><code>isset($_COOKIE["name"])</code></td><td>Prüfen, ob dieses Cookie existiert</td></tr>
+    <tr><td><code>setcookie("name", "", time()-100)</code></td><td>Cookie löschen: leerer Wert + Zeit in der Vergangenheit</td></tr>
+  </table>
+
+  <!-- ============ ÜBUNGSAUFGABEN ============ -->
+  <h2 class="section-title">🏋️ Übungs-Aufgaben</h2>
+  <p class="section-sub">Die Aufgaben aus dem Unterricht – probiere sie erst selbst, bevor du die Lösung aufklappst!
+     Anschauungs-Beispiele (nur im Schulnetz): <code>webserver.ferrarischule.at/wleeb/basics/</code></p>
+
+  <!-- UE1: Blog -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">UE1</span>
+      Blog: 15 Einträge mit der Schleife
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe (PHP_UE1_Blog):</strong> Wiederhole den HTML-Code für einen Blog-Eintrag
+         mit einer beliebigen Schleife <strong>15-mal</strong> und nummeriere die Überschrift fortlaufend.
+         Überlege: Was muss <em>innerhalb</em> der Schleife stehen, was darf nur einmal vorkommen?</p>
+      <div class="merke"><b>Tipp:</b> Genau wie in <b>05_htmlschleife.php</b> –
+        nur dass statt <code>&lt;li&gt;</code> ein ganzer Blog-Eintrag (Überschrift + Text) ausgegeben wird.
+        Die Nummer kommt aus der Zählvariable <code>$i</code>.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> PHP_UE1_Blog.php – Kernidee</div>
+<pre><span class="html-tag">&lt;body&gt;</span>
+    <span class="html-tag">&lt;h1&gt;</span>Mein Blog<span class="html-tag">&lt;/h1&gt;</span>
+    <span class="kw">&lt;?php</span>
+    <span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">15</span>; <span class="var">$i</span>++) {
+        <span class="fn">echo</span> <span class="str">"&lt;h2&gt;Überschrift $i&lt;/h2&gt;&lt;p&gt;Hier steht der Text ...&lt;/p&gt;"</span>;
+    }
+    <span class="kw">?&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- UE2: Blog mit Abfrage -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">UE2</span>
+      Blog: Überschriften mit if-Abfrage
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe (PHP_UE2_Blog.php):</strong> Die Überschriften sollen sich je nach Nummer ändern:
+         <strong>1–5</strong> als <code>&lt;h1&gt;</code>, <strong>6–10</strong> als <code>&lt;h2&gt;</code>,
+         <strong>11–15</strong> als <code>&lt;h3&gt;</code>. Formatiere die drei Überschriften-Größen unterschiedlich (CSS).</p>
+      <div class="merke"><b>Tipp:</b> Die Ausgabe muss in <b>zwei echo-Befehle</b> aufgeteilt werden,
+        damit die if-Abfrage dazwischen sitzen kann – genau wie in <b>06_abfrage.php</b>.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> PHP_UE2_Blog.php – Kernidee</div>
+<pre><span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">15</span>; <span class="var">$i</span>++) {
+    <span class="fn">echo</span> <span class="str">"&lt;"</span>;
+    <span class="kw">if</span> (<span class="var">$i</span> &lt;= <span class="num">5</span>) <span class="fn">echo</span> <span class="str">"h1"</span>;
+    <span class="kw">else if</span> (<span class="var">$i</span> &lt;= <span class="num">10</span>) <span class="fn">echo</span> <span class="str">"h2"</span>;
+    <span class="kw">else</span> <span class="fn">echo</span> <span class="str">"h3"</span>;
+    <span class="fn">echo</span> <span class="str">"&gt;Überschrift $i&lt;/"</span>;
+    <span class="cmt">// ... und das schließende Tag genauso zusammensetzen</span>
+}</pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Shop Teil 1 -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">S1</span>
+      UE1b Shop: 12 Produktkarten
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe (PHP_UE1b_Shop_1.php):</strong> Gib mit einer Schleife <strong>12 Produktkarten</strong> aus.
+         Jede Karte hat: Produktnamen fortlaufend nummeriert („Produkt 1“ …),
+         einen Preis, der aus der Zählvariable berechnet wird (<strong>Preis = Nummer × 5 €</strong>),
+         und einen Button „In den Warenkorb“. Gestalte die Karten mit CSS (Rahmen, Abstand,
+         <code>display: inline-block</code> oder <code>flex</code>).</p>
+      <div class="merke"><b>Tipp:</b> Innerhalb der Schleife rechnen:
+        <code>$preis = $i * 5;</code> – dann beides im echo ausgeben.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> Shop Teil 1 – Kernidee</div>
+<pre><span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">12</span>; <span class="var">$i</span>++) {
+    <span class="var">$preis</span> = <span class="var">$i</span> * <span class="num">5</span>;
+    <span class="fn">echo</span> <span class="str">"&lt;div class='card'&gt;&lt;h3&gt;Produkt $i&lt;/h3&gt;
+          &lt;p&gt;$preis €&lt;/p&gt;
+          &lt;button&gt;In den Warenkorb&lt;/button&gt;&lt;/div&gt;"</span>;
+}</pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Shop Teil 2 -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">S2</span>
+      UE1b Shop: Labels mit if-Abfrage
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe (PHP_UE1b_Shop_2.php):</strong> Je nach Produktnummer bekommt jede Karte ein Label
+         und eine CSS-Klasse: <strong>Produkt 1–4:</strong> „Günstig“ (Klasse <code>guenstig</code>),
+         <strong>5–8:</strong> „Standard“ (<code>standard</code>), <strong>9–12:</strong> „Premium“ (<code>premium</code>).
+         Zusatz: Produkt 12 zeigt zusätzlich <strong>„Bestseller!“</strong>. Die drei Klassen unterscheiden
+         sich optisch deutlich (z. B. grüner, grauer, goldener Rahmen).</p>
+      <div class="merke"><b>Tipp:</b> Erst mit if/else if/else die Variable <code>$klasse</code>
+        und <code>$label</code> festlegen – <em>dann</em> die Karte ausgeben. Das hält den echo-Befehl sauber.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> Shop Teil 2 – Kernidee</div>
+<pre><span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">12</span>; <span class="var">$i</span>++) {
+    <span class="kw">if</span> (<span class="var">$i</span> &lt;= <span class="num">4</span>) { <span class="var">$klasse</span> = <span class="str">"guenstig"</span>; <span class="var">$label</span> = <span class="str">"Günstig"</span>; }
+    <span class="kw">else if</span> (<span class="var">$i</span> &lt;= <span class="num">8</span>) { <span class="var">$klasse</span> = <span class="str">"standard"</span>; <span class="var">$label</span> = <span class="str">"Standard"</span>; }
+    <span class="kw">else</span> { <span class="var">$klasse</span> = <span class="str">"premium"</span>; <span class="var">$label</span> = <span class="str">"Premium"</span>; }
+
+    <span class="fn">echo</span> <span class="str">"&lt;div class='card $klasse'&gt;&lt;h3&gt;Produkt $i&lt;/h3&gt;&lt;p&gt;$label&lt;/p&gt;"</span>;
+    <span class="kw">if</span> (<span class="var">$i</span> == <span class="num">12</span>) <span class="fn">echo</span> <span class="str">"&lt;p&gt;Bestseller!&lt;/p&gt;"</span>;
+    <span class="fn">echo</span> <span class="str">"&lt;/div&gt;"</span>;
+}</pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Einmaleins Basic -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">1×1</span>
+      Einmaleins Basic: Malzahl per Variable
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe:</strong> Baue eine Website, die das kleine 1×1 für eine <strong>beliebige Zahl</strong>
+         anzeigt. Lege die „Malzahl“ in einer Variable fest und gib alle Produkte von 1 bis 10
+         in jeweils einer <strong>Tabellenzeile</strong> aus – nur die Zeile wird in der Schleife wiederholt!
+         Danach per CSS formatieren.</p>
+      <div class="merke"><b>Tipp:</b> <code>$ergebnis = $malzahl * $i;</code> innerhalb der Schleife –
+        und nur <code>&lt;tr&gt;...&lt;/tr&gt;</code> ins echo.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> einmaleins_basic.php – Kernidee</div>
+<pre><span class="html-tag">&lt;table&gt;</span>
+    <span class="html-tag">&lt;tr&gt;&lt;th&gt;</span>Rechnung<span class="html-tag">&lt;/th&gt;&lt;th&gt;</span>Ergebnis<span class="html-tag">&lt;/th&gt;&lt;/tr&gt;</span>
+    <span class="kw">&lt;?php</span>
+    <span class="var">$malzahl</span> = <span class="num">3</span>;
+    <span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">10</span>; <span class="var">$i</span>++) {
+        <span class="var">$ergebnis</span> = <span class="var">$malzahl</span> * <span class="var">$i</span>;
+        <span class="fn">echo</span> <span class="str">"&lt;tr&gt;&lt;td&gt;$malzahl × $i&lt;/td&gt;&lt;td&gt;$ergebnis&lt;/td&gt;&lt;/tr&gt;"</span>;
+    }
+    <span class="kw">?&gt;</span>
+<span class="html-tag">&lt;/table&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Einmaleins Extended -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">1×1+</span>
+      UE3 Einmaleins Extended: Malzahl per Formular
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe:</strong> Erweitere das 1×1 Basic: Die Malzahl soll über ein
+         <strong>Formular eingegeben</strong> werden können. Zusätzlich soll ein zweites Eingabefeld
+         festlegen, <strong>wie viele Zeilen</strong> angezeigt werden.</p>
+      <div class="merke"><b>Tipp:</b> Formular wie in <b>07/08</b> bauen, dann:
+        <code>$malzahl = $_GET["malzahl"];</code> und in der Schleife die Zeilenzahl als Abbruchbedingung nutzen.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> einmaleins_extended.php – Kernidee</div>
+<pre><span class="html-tag">&lt;form</span> method=<span class="str">"get"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;input</span> name=<span class="str">"malzahl"</span> type=<span class="str">"number"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;input</span> name=<span class="str">"zeilen"</span> type=<span class="str">"number"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;button&gt;</span>Anzeigen<span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span>
+<span class="kw">&lt;?php</span>
+<span class="var">$malzahl</span> = <span class="var">$_GET</span>[<span class="str">"malzahl"</span>];
+<span class="var">$zeilen</span>  = <span class="var">$_GET</span>[<span class="str">"zeilen"</span>];
+<span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="var">$zeilen</span>; <span class="var">$i</span>++) {
+    <span class="fn">echo</span> <span class="str">"$malzahl × $i = "</span> . (<span class="var">$malzahl</span>*<span class="var">$i</span>) . <span class="str">"&lt;br&gt;"</span>;
+}
+<span class="kw">?&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- UE3a: Einmaleins Nachbau -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">UE3a</span>
+      Einmaleins Nachbau: PHP ins fremde HTML
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe:</strong> Bau <strong>in einer vorgegebenen Datei</strong> (fremdes Design,
+         fertiges HTML – Referenz <code>einx1.php</code>) <strong> dieselbe Funktion ein wie in UE3</strong>.
+         Also: schau ganz genau hin, <em>wo</em> und <em>wie</em> PHP in ein bestehendes HTML eingebaut wird!</p>
+      <div class="merke"><b>Tipp:</b> Suche das Element, das sich wiederholt (die Tabellen<strong>zeile</strong>),
+        und ersetze nur dieses durch die Schleife. Kopf- und Fußbereich der Tabelle bleiben statisch –
+        wie in <b>05_htmlschleife.php</b>: dort blieben <code>&lt;ul&gt;</code> und <code>&lt;/ul&gt;</code> außen vor.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> einx1.php – Kernidee</div>
+<pre><span class="html-tag">&lt;table&gt;</span>
+    <span class="html-tag">&lt;tr&gt;&lt;th&gt;</span>#<span class="html-tag">&lt;/th&gt;&lt;th&gt;</span>mal<span class="html-tag">&lt;/th&gt;&lt;th&gt;</span>ist<span class="html-tag">&lt;/th&gt;&lt;/tr&gt;</span>
+    <span class="kw">&lt;?php</span>
+    <span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">10</span>; <span class="var">$i</span>++) {
+        <span class="fn">echo</span> <span class="str">"&lt;tr&gt;&lt;td&gt;$i&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;&lt;td&gt;"</span>.(<span class="num">3</span>*<span class="var">$i</span>).<span class="str">"&lt;/td&gt;&lt;/tr&gt;"</span>;
+    }
+    <span class="kw">?&gt;</span>
+<span class="html-tag">&lt;/table&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Quadratkarten Schritt 1 -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">Q1</span>
+      Quadratkarten – Schritt 1: Schleife statt Copy-Paste
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe (quadratkarten_schritt1):</strong> Nimm die angehängte Datei als Grundlage
+         (drei statische Karten als Beispiel) und programmiere in PHP die Wiederholung <strong>einer Karte</strong>,
+         um die Quadratzahlen jeder Zahl von <strong>1 bis 15</strong> darzustellen.
+         Suche den HTML-Code, der wiederholt werden muss, und verändere ihn so, dass jeweils
+         die richtigen Informationen auf der Karte stehen.
+         Unterscheide danach in der Schleife, ob die Zahl gerade oder ungerade ist:
+         gerade → <code>&lt;div class='card even'&gt;</code>, ungerade → <code>&lt;div class='card odd'&gt;</code>.</p>
+      <div class="merke"><b>Tipp:</b> Gerade/ungerade prüfst du mit <strong>Modulo</strong>:
+        <code>$i % 2 == 0</code> heißt „durch 2 teilbar“. Das ist die flexible Variante –
+        statt für jede Zahl eine eigene if-Abfrage zu schreiben (siehe Demo-Karte unten!).</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> quadratkarten_schritt1.php – Kernidee</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">15</span>; <span class="var">$i</span>++) {
+    <span class="var">$quad</span> = <span class="var">$i</span>*<span class="var">$i</span>;
+    <span class="kw">if</span> (<span class="var">$i</span>%<span class="num">2</span> == <span class="num">0</span>) <span class="var">$klasse</span> = <span class="str">"even"</span>;
+    <span class="kw">else</span> <span class="var">$klasse</span> = <span class="str">"odd"</span>;
+    <span class="fn">echo</span> <span class="str">"&lt;div class='card $klasse'&gt;
+        &lt;h2&gt;$i&lt;/h2&gt;
+        &lt;p&gt;Quadrat:&lt;br&gt;$quad&lt;/p&gt;
+    &lt;/div&gt;"</span>;
+}
+<span class="kw">?&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Quadratkarten Schritt 2 -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">Q2</span>
+      Quadratkarten – Schritt 2: Anzahl per Formular
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe (quadratkarten_schritt2):</strong> Ergänze die Datei aus Schritt 1
+         um ein <strong>Formular, mit dem man die Anzahl der Karten bestimmen kann</strong>.
+         Die Schleife läuft dann nicht mehr bis 15, sondern bis zur eingegebenen Anzahl.</p>
+      <div class="merke"><b>Tipp:</b> Genau wie in <b>08_formular_get.php</b>:
+        Formular mit <code>method="get"</code>, Anzahl aus <code>$_GET["anzahl"]</code> auslesen –
+        und <code>if ($_GET)</code> sorgt dafür, dass es beim ersten Aufruf einen Default-Wert gibt.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> quadratkarten_schritt2.php – Kernidee</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="kw">if</span> (<span class="var">$_GET</span>) {
+    <span class="var">$anzahl</span> = <span class="var">$_GET</span>[<span class="str">"anzahl"</span>];
+}
+<span class="kw">else</span> {
+    <span class="var">$anzahl</span> = <span class="num">15</span>;   <span class="cmt">// Default, wenn noch nichts eingegeben wurde</span>
+}
+<span class="kw">?&gt;</span>
+<span class="html-tag">&lt;form</span> method=<span class="str">"get"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;input</span> name=<span class="str">"anzahl"</span> type=<span class="str">"number"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;button</span> type=<span class="str">"submit"</span><span class="html-tag">&gt;</span>Anzeigen<span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span>
+<span class="cmt">&lt;!-- ... und in der Schleife: $i &lt;= $anzahl ... --&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- UE Zahlenraten -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">🎲</span>
+      UE Zahlenraten: Das Ratespiel
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe (zahlenraten.php):</strong> Erstelle ein Zahlenratespiel:
+         Der Spieler / die Spielerin hat pro Zahl <strong>nur einen Versuch</strong>.
+         Nach dem Raten wird ausgegeben, ob es <strong>RICHTIG</strong> oder <strong>FALSCH</strong> war –
+         z. B.: „Meine Zahl war 3. Du hast 2 geraten! Das ist FALSCH!! :-(“.
+         Design wieder individuell – CSS-Trickkiste aufmachen!</p>
+      <div class="merke"><b>Pro Tipp:</b> Eine Zufallszahl zwischen 1 und 100 bekommst du mit
+        <code>rand(1, 100)</code> – siehe <b>Lektion 11</b>. Im Musterbeispiel wird mit 1 bis 5 gespielt.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> zahlenraten.php – Kernidee</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="kw">if</span> ( !<span class="fn">empty</span>(<span class="var">$_POST</span>[<span class="str">"tipp"</span>])) {
+    <span class="var">$zufallszahl</span> = <span class="fn">rand</span>(<span class="num">1</span>, <span class="num">5</span>);
+    <span class="var">$tipp</span> = <span class="var">$_POST</span>[<span class="str">"tipp"</span>];
+    <span class="kw">if</span> (<span class="var">$tipp</span> == <span class="var">$zufallszahl</span>) {
+        <span class="fn">echo</span> <span class="str">"Meine Zahl war $zufallszahl. Du hast $tipp geraten! Das ist RICHTIG!! :-)"</span>;
+    }
+    <span class="kw">else</span> {
+        <span class="fn">echo</span> <span class="str">"Meine Zahl war $zufallszahl. Du hast $tipp geraten! Das ist FALSCH!! :-("</span>;
+    }
+}
+<span class="kw">?&gt;</span>
+<span class="html-tag">&lt;form</span> method=<span class="str">"post"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;input</span> name=<span class="str">"tipp"</span> type=<span class="str">"number"</span> placeholder=<span class="str">"Errate mich!"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;button&gt;</span>Raten!<span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+  <!-- Gemeinsame UE: besuchszaehler.php -->
+  <section class="topic" id="ue_besuchszaehler">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">👥</span>
+      Gemeinsame Übung: besuchszaehler.php
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Gemeinsame Übung aus dem Unterricht (besuchszaehler.php):</strong> Ein Besuchszähler – die Seite merkt sich per Cookie, wie oft du sie schon besucht hast. Bei jedem Aufruf zählt sie um 1 hoch und gibt aus: „Du bist zum ... Mal hier ...“</p>
+
+      <div class="merke"><b>Merke dir:</b> Alles, was du dafür brauchst, steht in <b>Lektion 12</b>: <code>isset($_COOKIE[...])</code> prüfen, Zähler <strong>+1</strong> (sonst bei 1 starten), und zuletzt mit <code>setcookie(..., time()+120)</code> wieder speichern.</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution">
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> besuchszaehler.php – Kernidee</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// prüfen ob ein Cookie vorhanden ist</span>
+<span class="kw">if</span> (<span class="fn">isset</span>(<span class="var">$_COOKIE</span>[<span class="str">"besuche"</span>])) {
+    <span class="var">$anzahl</span> = <span class="var">$_COOKIE</span>[<span class="str">"besuche"</span>]+<span class="num">1</span>;
+}
+<span class="kw">else</span> {
+    <span class="var">$anzahl</span> = <span class="num">1</span>;
+}
+
+<span class="fn">setcookie</span>(<span class="str">"besuche"</span>, <span class="var">$anzahl</span>, <span class="fn">time</span>()+<span class="num">120</span>);
+
+<span class="kw">?&gt;</span>
+<span class="html-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="html-tag">&lt;html lang="en"&gt;</span>
+<span class="html-tag">&lt;head&gt;</span>
+    <span class="html-tag">&lt;meta charset="UTF-8"&gt;</span>
+    <span class="html-tag">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>
+    <span class="html-tag">&lt;title&gt;</span>Besuchszaehler<span class="html-tag">&lt;/title&gt;</span>
+<span class="html-tag">&lt;/head&gt;</span>
+<span class="html-tag">&lt;body&gt;</span>
+    <span class="html-tag">&lt;h1&gt;</span>Willkommen<span class="html-tag">&lt;/h1&gt;</span>
+    <span class="html-tag">&lt;p&gt;</span>Du bist zum <span class="kw">&lt;?php</span> <span class="fn">echo</span> <span class="var">$anzahl</span>;<span class="kw">?&gt;</span>. Mal hier...<span class="html-tag">&lt;/p&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- UE_09: Lieblingsfarbe -->
+  <section class="topic" id="ue_lieblingsfarbe">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">UE9</span>
+      UE_09: Lieblingsfarbe – die Seite merkt sich deine Farbe
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Übung UE_09 (lieblingsfarbe.php):</strong> Deine Seite soll sich an die gewählte Lieblingsfarbe <strong>erinnern</strong>. Öffne die Startdatei <code>lieblingsfarbe.php</code> – vorhanden sind schon das Formular mit dem Farbfeld (<code>type="color"</code>) und die Variable <code>$farbe</code>. <strong>Arbeite nur im Bereich ganz oben in der Datei.</strong></p>
+
+      <h3>🔍 Die drei Fälle laut Angabe</h3>
+      <ul>
+        <li><strong>Fall 1:</strong> Die Seite wird nach der Formulareingabe neu geladen → die Farbwahl aus <code>$_POST</code> soll als Hintergrundfarbe angezeigt <strong>und im Cookie gespeichert</strong> werden</li>
+        <li><strong>Fall 2:</strong> Seite wird ohne Formulareingabe geladen, aber es existiert schon ein Cookie von einem früheren Besuch → Farbe aus dem Cookie anzeigen</li>
+        <li><strong>Fall 3:</strong> Aller erster Besuch – kein Formular, kein Cookie → Hintergrundfarbe bleibt <strong>weiß</strong></li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> <b>Hinweise laut Angabe:</b> Es muss nur in dieser einen Datei gearbeitet werden. Das Cookie läuft nach <strong>zwei Minuten</strong> ab – teste danach, ob deine Seite wieder weiß wird!</div>
+
+      <p>Musterbeispiel (nur Schulnetz): <code>webserver.ferrarischule.at/beispiele/ue_lieblingsfarbe/lieblingsfarbe.php</code></p>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution">
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> lieblingsfarbe.php – die drei Fälle im PHP-Block</div>
+<pre><span class="kw">&lt;?php</span>
+
+<span class="var">$farbe</span> = <span class="str">"white"</span>;
+
+<span class="kw">if</span> ( <span class="fn">isset</span>(<span class="var">$_POST</span>[<span class="str">"farbwahl"</span>]) ) {
+    <span class="cmt">// Fall 1: Formular wurde abgeschickt</span>
+    <span class="var">$farbe</span> = <span class="var">$_POST</span>[<span class="str">"farbwahl"</span>];
+    <span class="fn">setcookie</span>(<span class="str">"farbwahl"</span>, <span class="var">$farbe</span>, <span class="fn">time</span>()+<span class="num">120</span>);   <span class="cmt">// 2 Minuten</span>
+}
+elseif ( <span class="fn">isset</span>(<span class="var">$_COOKIE</span>[<span class="str">"farbwahl"</span>]) ) {
+    <span class="cmt">// Fall 2: Cookie von einem frueheren Besuch</span>
+    <span class="var">$farbe</span> = <span class="var">$_COOKIE</span>[<span class="str">"farbwahl"</span>];
+}
+<span class="cmt">// Fall 3: weder noch -&gt; $farbe bleibt "white"</span>
+
+<span class="kw">?&gt;</span>
+<span class="html-tag">&lt;!doctype html&gt;</span>
+<span class="html-tag">&lt;html&gt;</span>
+    <span class="html-tag">&lt;head&gt;</span>
+        <span class="html-tag">&lt;meta charset="utf-8"&gt;</span>
+        <span class="html-tag">&lt;title&gt;</span>Lieblingsfarbe<span class="html-tag">&lt;/title&gt;</span>
+        <span class="html-tag">&lt;style&gt;</span>
+            body { background-color: <span class="kw">&lt;?php</span> <span class="fn">echo</span> <span class="var">$farbe</span> <span class="kw">?&gt;</span> ; }
+            h1 { background-color: turquoise; color: yellow; }
+        <span class="html-tag">&lt;/style&gt;</span>
+    <span class="html-tag">&lt;/head&gt;</span>
+    <span class="html-tag">&lt;body&gt;</span>
+        <span class="html-tag">&lt;h1&gt;</span>Waehle deine Lieblingsfarbe<span class="html-tag">&lt;/h1&gt;</span>
+        <span class="html-tag">&lt;form method="POST"&gt;</span>
+            <span class="html-tag">&lt;input type="color" name="farbwahl"&gt;</span>
+            <span class="html-tag">&lt;br&gt;</span>
+            <span class="html-tag">&lt;input type="submit"&gt;</span>
+        <span class="html-tag">&lt;/form&gt;</span>
+    <span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+
+  <!-- Demo: Abfrage & Schleife -->
+  <section class="topic">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">🧩</span>
+      Demo: Abfrage &amp; Schleife kombinieren
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Lern-Beispiel aus dem Unterricht (abfrage-schleife.php):</strong>
+         26 Blöcke mit Überschrift und Text – und nach <strong>jedem zweiten Block</strong> soll ein
+         zusätzliches <code>&lt;hr&gt;</code> ausgegeben werden. Dafür kombinieren wir erstmals
+         <strong>Schleife + Abfrage</strong> – und lernen dabei den Modulo-Operator kennen.</p>
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> abfrage-schleife.php – die flexible Variante</div>
+<pre><span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">26</span>; <span class="var">$i</span>++) {
+    <span class="fn">echo</span> <span class="str">"&lt;b&gt;Überschrift vom Block $i&lt;/b&gt;
+    &lt;br&gt;
+    &lt;em&gt;Ich bin ein Text vom Block&lt;/em&gt;
+    &lt;hr&gt;"</span>;
+
+    <span class="cmt">// nach jedem zweiten Block ein &lt;hr&gt; zusätzlich ausgeben</span>
+    <span class="cmt">// Lösungsvariante 2 (eher flexibel)</span>
+    <span class="cmt">// Modulo (%-Zeichen) ergibt den Rest einer Division</span>
+    <span class="kw">if</span> (<span class="var">$i</span> % <span class="num">2</span> == <span class="num">0</span>) {
+        <span class="fn">echo</span> <span class="str">"&lt;hr&gt;"</span>;
+    }
+}</pre>
+      </div>
+      <p>Im Unterricht haben wir auch die <strong>Variante 1</strong> besprochen: für jede gerade Zahl eine
+         eigene if-Abfrage (<code>if ($i==2) ... if ($i==4) ... if ($i==6) ...</code>) –
+         das funktioniert, ist aber <em>„nicht sehr flexibel“</em>: Bei 26 Blöcken bräuchtest du 13 Abfragen,
+         und bei jeder Änderung der Blockzahl müsstest du alle anpassen.</p>
+      <div class="merke"><b>Merke dir:</b> <code>$i % 2</code> ist der <strong>Modulo-Operator</strong> –
+        er liefert den <b>Rest der Division</b>. Gerade Zahlen haben Rest 0, ungerade Rest 1.
+        Mit einer einzigen if-Abfrage regelst du <em>alle</em> Fälle – dieselbe Technik wie bei den
+        Quadratkarten und in Lektion 06!</div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <h2 class="section-title">🧠 Quiz: Bist du bereit?</h2>
+  <p class="section-sub">20 Fragen zu den Lektionen 01–12. Beim Start kannst du wählen: alle Fragen – oder nur die neuen (passend zu den 🆕-markierten Themen: Cookies &amp; die neuen Übungen!). Überlege gut, du kannst jede Frage nur einmal beantworten!</p>
+
+  <div class="quiz-card" id="quiz">
+    <div class="quiz-progress"><div class="bar" id="quizBar"></div></div>
+    <div class="quiz-meta">
+      <span id="quizCount">Frage 1 von 20</span>
+      <span>Punkte: <b id="quizScore">0</b></span>
+    </div>
+
+    <div id="quizStart">
+      <p>Wie möchtest du starten? Dein Fortschritt wird auf diesem Gerät gespeichert – du kannst jederzeit weitermachen.</p>
+      <div class="quiz-start-btns">
+        <button class="quiz-next" id="btnAll" onclick="startQuiz('all')">📋 Alle Fragen</button>
+        <button class="quiz-next" id="btnNew" onclick="startQuiz('new')">🆕 Nur die neuen Fragen</button>
+        <button class="quiz-next" id="btnOpen" onclick="startQuiz('open')">🔄 Offene Fragen üben</button>
+      </div>
+      <p id="progressLine"></p>
+      <button class="quiz-reset" onclick="resetFortschritt()">🗑 Fortschritt auf diesem Gerät zurücksetzen</button>
+    </div>
+
+    <div id="quizPlay" style="display:none">
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="quiz-code" id="quizCode"></div>
+      <div id="quizAnswers"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="quiz-next" id="quizNext" onclick="nextQuestion()">Weiter →</button>
+    </div>
+
+    <div class="quiz-result" id="quizResult">
+      <div class="emoji" id="resultEmoji">🎉</div>
+      <h3 id="resultTitle">Quiz geschafft!</h3>
+      <div class="score" id="resultScore">0 / 20</div>
+      <p id="resultText"></p>
+      <button class="quiz-restart" onclick="restartQuiz()">🔄 Nochmal versuchen</button>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Erstellt für den AINF-Unterricht • PHP läuft auf dem Server, dein Browser sieht nur das Ergebnis 😉<br>
+  Tipp: Teste alles selbst mit <code>MAMP</code>
+</footer>
+
+<script>
+/* ---------- Themen-Aufklapper ---------- */
+function toggleTopic(btn) {
+  const sec = btn.parentElement;
+  const jetztOffen = sec.classList.toggle('open');
+  if (jetztOffen) themaGesehen(sec);
+}
+
+/* Wenn ein als NEU markiertes Kapitel aufgemacht wird,
+   merken wir uns das pro Geraet – das Badge verschwindet dann persönlich. */
+function themaGesehen(sec) {
+  if (!sec.id || NEUE_THEMEN.indexOf(sec.id) === -1) return;
+  const f = ladeFortschritt();
+  if (f.gesehen.indexOf(sec.id) === -1) {
+    f.gesehen.push(sec.id);
+    speichereFortschritt(f);
+  }
+  const badge = sec.querySelector('.new-badge');
+  if (badge) badge.remove();
+}
+
+function toggleSolution(btn) {
+  const sol = btn.nextElementSibling;
+  const open = sol.classList.toggle('open');
+  btn.textContent = open ? '🙈 Lösung ausblenden' : '💡 Lösung anzeigen';
+}
+
+/* ---------- Quiz ---------- */
+const questions = [
+  {
+    q: "Womit endet jede PHP-Anweisung?",
+    answers: ["Mit einem Punkt (.)", "Mit einem Doppelpunkt (:)", "Mit einem Semikolon (;)", "Mit einem Komma (,)"],
+    correct: 2,
+    explain: "Jede Anweisung in PHP endet mit einem Semikolon \u2013 vergisst du es, folgt ein Parse Error."
+  },
+  {
+    q: "Wie schreibst du einen EINZEILIGEN Kommentar in PHP?",
+    answers: ["// Kommentar", "<!-- Kommentar -->", "/* Kommentar */", "#* Kommentar *#"],
+    correct: 0,
+    explain: "// ist der einzeilige Kommentar, /* ... */ der mehrzeilige. <!-- --> ist HTML und gilt f\u00fcr die ganze Datei \u2013 wie ganz oben in 01_helloworld.php!"
+  },
+  {
+    q: "Was gibt dieser Code im Browser aus?",
+    code: '$zahl = 5;\necho "Die Variable zahl hat den Wert $zahl";',
+    answers: ["Eine Fehlermeldung", "Die Variable zahl hat den Wert $zahl", "Die Variable text hat den Wert 5", "Die Variable zahl hat den Wert 5"],
+    correct: 3,
+    explain: "Im doppelten Anf\u00fchrungszeichen wird $zahl durch den Wert ersetzt \u2013 genau wie in 03_variablen.php."
+  },
+  {
+    q: "Was ist der Datentyp von $komma = 4.5; ?",
+    answers: ["string", "float", "integer", "double-integer"],
+    correct: 1,
+    explain: "Kommazahlen hei\u00dfen float \u2013 und werden mit PUNKT geschrieben (4.5, nicht 4,5)."
+  },
+  {
+    q: "Wie verkn\u00fcpfst du einen Text mit einer Variable?",
+    answers: ['"Der Wert: " . $text', '"Der Wert: " + $text', '"Der Wert: " -> $text', 'join("Der Wert: ", $text)'],
+    correct: 0,
+    explain: 'Der Punkt h\u00e4ngt Strings zusammen: "Die Variable text hat den Wert: ".$text \u2013 die zweite Ausgabe-Variante aus 03_variablen.php.'
+  },
+  {
+    q: "Was gibt dieser Code aus?",
+    code: '$text = "Hallo";\n$text = "PHP";\necho $text;',
+    answers: ["HalloPHP", "PHP", "Hallo", "Eine Fehlermeldung"],
+    correct: 1,
+    explain: "Die zweite Zuweisung \u00fcberschreibt die erste \u2013 am Ende gilt immer der letzte Wert."
+  },
+  {
+    q: "Was sind die drei Parameter der for-Schleife \u2013 in dieser Reihenfolge?",
+    answers: ["Schrittweite; Startwert; Abbruchbedingung", "Startwert; Abbruchbedingung; Schrittweite", "Abbruchbedingung; Startwert; Schrittweite", "Startwert; Schrittweite; Endwert"],
+    correct: 1,
+    explain: "for ($i=1; $i<=10; $i++) \u2192 1. Startwert (Z\u00e4hlvariable), 2. Abbruchbedingung, 3. Schrittweite \u2013 wie in 04_schleife.php kommentiert."
+  },
+  {
+    q: "Wie oft l\u00e4uft diese Schleife aus 05_htmlschleife.php?",
+    code: 'for ($mimi=1; $mimi<=12; $mimi++) {\n    echo "<li>Mimimimi</li>";\n}',
+    answers: ["11-mal", "Unendlich oft", "12-mal", "13-mal"],
+    correct: 2,
+    explain: "Sie startet bei 1 und l\u00e4uft, solange $mimi <= 12 ist \u2013 also 12 Listeneintr\u00e4ge. Und: Die Z\u00e4hlvariable darf ruhig anders hei\u00dfen als $i!"
+  },
+  {
+    q: "Was macht $i++ in einer Schleife?",
+    answers: ["Nichts, das ist nur ein Kommentar", "Multipliziert die Z\u00e4hlvariable mit sich selbst", "Setzt $i auf 0 zur\u00fcck", "Addiert 1 zur Z\u00e4hlvariable"],
+    correct: 3,
+    explain: "$i++ ist die Kurzform von $i = $i + 1 \u2013 ohne diesen Schritt w\u00e4re die Bedingung immer wahr (Endlosschleife)."
+  },
+  {
+    q: "Warum steht in 02_html.php der PHP-Block mitten im HTML?",
+    answers: ["Damit der Code besser aussieht", "Weil PHP nur dort l\u00e4uft, wo es gebraucht wird", "Damit die Seite schneller l\u00e4dt", "Das ist ein Fehler im Unterrichtsmaterial"],
+    correct: 1,
+    explain: "PHP-Bl\u00f6cke k\u00f6nnen beliebig oft ge\u00f6ffnet und geschlossen werden \u2013 der Server setzt die Ausgabe genau an dieser Stelle ins HTML ein."
+  },
+  {
+    q: "Was gibt 06_abfrage.php mit $alter = 18 im Browser aus?",
+    code: '$alter = 18;\nif ($alter < 16) {\n    echo "Nein, du bleibst draußen.";\n}\nelse if ($alter <= 18) {\n    echo "Du darfst rein, aber keine harten Drinks";\n}',
+    answers: ["Du darfst rein, aber keine harten Drinks", "Nein, du bleibst drau\u00dfen.", "Willkommens-Shot inklusive", "Ja, komm rein."],
+    correct: 0,
+    explain: "PHP pr\u00fcft von oben nach unten: 18 < 16 ist falsch, 18 <= 18 ist wahr \u2192 diese Ausgabe gewinnt, der Rest wird \u00fcbersprungen."
+  },
+  {
+    q: "Was macht isset($_POST[\"email\"]) in 09_formular-html.php?",
+    answers: ["Pr\u00fcft, ob die E-Mail-Adresse g\u00fcltig ist", "L\u00f6scht das Feld aus dem Formular", "Pr\u00fcft, ob das Feld abgeschickt wurde \u2013 also \u00fcberhaupt existiert", "Verschickt die E-Mail automatisch"],
+    correct: 2,
+    explain: "isset() pr\u00fcft die Existenz: Ist das Formular abgeschickt worden, existiert $_POST[\"email\"] \u2013 so vermeidest du Warnungen beim ersten Seitenaufruf."
+  },
+  {
+    q: "Nach dem Abschicken eines GET-Formulars sieht die URL so aus: ...?eingabe=Hallo&alter=17. Was bedeutet das Fragezeichen?",
+    answers: ["Es gibt einen Fehler auf der Seite", "Die Seite wird verschl\u00fcsselt \u00fcbertragen", "Das Formular wurde zweimal abgeschickt", "Ab hier beginnen die GET-Daten als Name=Wert-Paare"],
+    correct: 3,
+    explain: "Alles hinter dem ? sind die GET-Parameter, getrennt durch & \u2013 genau deshalb sollte man mit GET keine Passw\u00f6rter \u00fcbertragen."
+  },
+  {
+    q: "Was macht if ($i % 2 == 0) in den Quadratkarten?",
+    code: 'if ($i % 2 == 0) $klasse = "even";\nelse $klasse = "odd";',
+    answers: ["Verdoppelt den Wert von $i", "Ob $i gro\u00dfer als 2 ist", "Ob $i genau 2 ist", "Ob $i durch 2 teilbar ist (gerade Zahl)"],
+    correct: 3,
+    explain: "% ist der Modulo-Operator: er gibt den Rest der Division. 6 % 2 = 0 (gerade), 7 % 2 = 1 (ungerade) \u2013 so bekommen gerade und ungerade Karten unterschiedliche CSS-Klassen."
+  },
+  {
+    q: "Was liefert rand(1, 100) in 11_zufallszahlen.php?",
+    answers: ["Immer 1", "Eine Zufallszahl zwischen 0 und 100", "Eine Zufallszahl zwischen 1 und 100 (beide Grenzen eingeschlossen)", "Einen Fehler, weil 100 zu gro\u00df ist"],
+    correct: 2,
+    explain: "rand(MIN, MAX) liefert eine ganze Zufallszahl inklusive beider Grenzen \u2013 rand(1, 6) w\u00e4re z. B. ein W\u00fcrfel."
+  },
+  {
+    q: "Warum haben die Radio-Buttons in 10_formular-prefill.php beide name=\"hobby\"?",
+    answers: ["Gleiches name = eine Gruppe: nur eine Option (Reiten oder Turnen) kann ausgew\u00e4hlt werden", "Zufall \u2013 der Name w\u00e4re egal", "Damit PHP sie besser findet", "Damit beide gleichzeitig w\u00e4hlbar sind"],
+    correct: 0,
+    explain: "Radio-Buttons mit demselben name-Attribut bilden eine Gruppe \u2013 der Browser erlaubt nur eine Auswahl, und der gew\u00e4hlte value landet in $_POST[\"hobby\"]."
+  },
+  {
+    q: "Was bedeuten die drei Parameter in setcookie(\"username\", \"sepp\", time()+45) aus 12_cookies/cookies_1.php?",
+    neu: true,
+    answers: ["Name des Cookies, Wert, Ablaufzeit (aktuelle Zeit plus 45 Sekunden)", "Name, Passwort, Serveradresse", "Benutzername, Alter, Loginzeit", "Datenbankname, Tabelle, Feld"],
+    correct: 0,
+    explain: "setcookie(NAME, WERT, Ablaufdatum): \"sepp\" wird im Cookie username gespeichert und gilt 45 Sekunden \u2013 nach dem Ablaufdatum l\u00f6scht der Browser es von selbst."
+  },
+  {
+    q: "Womit liest du in cookies_2.php das gespeicherte Cookie username aus?",
+    neu: true,
+    answers: ["readcookie(\"username\")", "$cookie[\"username\"]", "$_COOKIE[\"username\"]", "getcookie(\"username\")"],
+    correct: 2,
+    explain: "$_COOKIE ist eine Superglobale wie $_POST und $_GET \u2013 mit isset($_COOKIE[\"username\"]) pr\u00fcfst du vorher, ob es \u00fcberhaupt existiert."
+  },
+  {
+    q: "Wie l\u00f6scht cookies_3.php das Cookie username?",
+    neu: true,
+    answers: ["deletecookie(\"username\")", "setcookie(\"username\", \"\", time()-100) \u2013 leerer Wert plus Zeit in der Vergangenheit", "setcookie(\"username\", \"\", time()+100)", "Das Cookie kann man nicht l\u00f6schen"],
+    correct: 1,
+    explain: "L\u00f6schen geht wieder mit setcookie: leerer Wert UND ein Ablaufdatum, das bereits vorbei ist (time()-100) \u2013 der Browser verwirft das Cookie dann sofort."
+  },
+  {
+    q: "Was macht if (isset($_COOKIE[\"besuche\"])) in besuchszaehler.php?",
+    neu: true,
+    answers: ["Erzeugt immer ein neues Cookie mit dem Wert 1", "L\u00f6scht das Cookie besuche", "Pr\u00fcft, ob der Browser Cookies erlaubt", "Pr\u00fcft, ob schon ein Besuchs-Z\u00e4hler-Cookie existiert \u2013 dann wird weitergez\u00e4hlt, sonst startet es bei 1"],
+    correct: 3,
+    explain: "Schon unterwegs? Cookie existiert \u2192 $anzahl = $_COOKIE[\"besuche\"]+1. Erster Besuch? isset ist falsch \u2192 $anzahl = 1. Danach speichert setcookie den neuen Stand (time()+120)."
+  }
+];
+
+/* ================================================================
+   🔧 PFLEGE-LISTE: Neue Inhalte markieren
+   Wenn neue Kapitel/Übungen dazukommen, hier einfach die id des
+   <section>-Elements eintragen (z. B. 'thema13', 'ue7').
+   Die Seite setzt dann automatisch ein NEU-Badge an den Kapitel-
+   Button. Das Badge verschwindet pro Schueler:in, sobald das
+   Kapitel einmal aufgemacht wurde (localStorage, siehe toggleTopic).
+   Neue Quiz-Fragen markierst du mit  neu: true  – sie erscheinen
+   dann im Modus "Nur die neuen Fragen".
+   Aktuell neu: Lektion 12 Cookies ('thema12'), besuchszaehler.php ('ue_besuchszaehler') und UE_09 Lieblingsfarbe ('ue_lieblingsfarbe').
+   ================================================================ */
+const NEUE_THEMEN = ['thema12', 'ue_besuchszaehler', 'ue_lieblingsfarbe'];
+
+let quizPool = questions;
+let current = 0;
+let score = 0;
+let answered = false;
+
+const quizQuestion = document.getElementById('quizQuestion');
+const quizCode = document.getElementById('quizCode');
+const quizAnswers = document.getElementById('quizAnswers');
+const quizFeedback = document.getElementById('quizFeedback');
+const quizNext = document.getElementById('quizNext');
+const quizBar = document.getElementById('quizBar');
+
+function esc(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function showQuestion() {
+  answered = false;
+  const item = quizPool[current];
+  quizQuestion.textContent = 'Frage ' + (current + 1) + ': ' + item.q;
+  quizCode.innerHTML = item.code
+    ? '<div class="code-window"><pre>' + esc(item.code).replace(/\n/g, '<br>') + '</pre></div>'
+    : '';
+  quizAnswers.innerHTML = '';
+  quizFeedback.className = 'quiz-feedback';
+  quizFeedback.textContent = '';
+  quizNext.style.display = 'none';
+
+  item.answers.forEach(function(ans, i) {
+    const btn = document.createElement('button');
+    btn.className = 'answer';
+    btn.textContent = ans;
+    btn.onclick = function() { checkAnswer(i, btn); };
+    quizAnswers.appendChild(btn);
+  });
+
+  document.getElementById('quizCount').textContent = 'Frage ' + (current + 1) + ' von ' + quizPool.length;
+  quizBar.style.width = (current / quizPool.length * 100) + '%';
+}
+
+function checkAnswer(i, btn) {
+  if (answered) return;
+  answered = true;
+  const item = quizPool[current];
+  const buttons = quizAnswers.querySelectorAll('.answer');
+  const f = ladeFortschritt();
+  f.answers[item._i] = (i === item.correct) ? 'ok' : 'nope';
+  speichereFortschritt(f);
+  buttons.forEach(function(b) { b.disabled = true; });
+  buttons[item.correct].classList.add('correct');
+
+  if (i === item.correct) {
+    score++;
+    document.getElementById('quizScore').textContent = score;
+    quizFeedback.className = 'quiz-feedback ok';
+    quizFeedback.textContent = '✅ Richtig! ' + item.explain;
+  } else {
+    btn.classList.add('wrong');
+    quizFeedback.className = 'quiz-feedback nope';
+    quizFeedback.textContent = '❌ Nicht ganz. ' + item.explain;
+  }
+  quizNext.textContent = current === quizPool.length - 1 ? 'Ergebnis anzeigen 🏁' : 'Weiter →';
+  quizNext.style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  current++;
+  if (current < quizPool.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('quizPlay').style.display = 'none';
+  const result = document.getElementById('quizResult');
+  result.style.display = 'block';
+  document.getElementById('resultScore').textContent = score + ' / ' + quizPool.length;
+  const ratio = score / quizPool.length;
+  let emoji, title, text;
+  if (ratio === 1) { emoji = '🏆'; title = 'Perfekt!'; text = 'Du kennst die Lektionen 01–12 in und auswendig. Bereit für das nächste Projekt!'; }
+  else if (ratio >= 0.7) { emoji = '🎉'; title = 'Super gemacht!'; text = 'Du hast die Grundlagen drauf. Schau dir noch einmal die Themen an, bei denen du unsicher warst.'; }
+  else if (ratio >= 0.4) { emoji = '💪'; title = 'Guter Anfang!'; text = 'Wiederhole die Themen und versuche es noch einmal – Übung macht den Meister.'; }
+  else { emoji = '📚'; title = 'Nochmal üben!'; text = 'Klappe die Themen oben noch einmal auf und arbeite die Code-Beispiele selbst nach. Dann klappt es beim nächsten Mal!'; }
+  const f = ladeFortschritt();
+  const geloest = Object.keys(f.answers).filter(function(k) { return f.answers[k] === 'ok'; }).length;
+  text += ' Insgesamt hast du inzwischen ' + geloest + ' von ' + questions.length + ' Fragen richtig gelöst.';
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultText').textContent = text;
+}
+
+/* ---------- Fortschritt pro Gerät (localStorage) ----------
+   answers = { 0: 'ok', 3: 'nope', ... }  (Index der Frage im questions-Array)
+   Wichtig: Fragen nur AM ENDE anfügen, sonst verschieben sich die Indizes. */
+const F_KEY = 'php_5g_fortschritt';
+
+function ladeFortschritt() {
+  try {
+    const f = JSON.parse(localStorage.getItem(F_KEY));
+    if (f && typeof f === 'object') {
+      return { answers: f.answers || {}, gesehen: Array.isArray(f.gesehen) ? f.gesehen : [] };
+    }
+  } catch (e) {}
+  return { answers: {}, gesehen: [] };
+}
+
+function speichereFortschritt(f) {
+  try { localStorage.setItem(F_KEY, JSON.stringify(f)); } catch (e) {}
+}
+
+function quizMitIndex() {
+  return questions.map(function(q, i) { return Object.assign({}, q, { _i: i }); });
+}
+
+function startQuiz(mode) {
+  const alle = quizMitIndex();
+  if (mode === 'new')      quizPool = alle.filter(function(q) { return q.neu; });
+  else if (mode === 'open') quizPool = alle.filter(function(q) { return ladeFortschritt().answers[q._i] !== 'ok'; });
+  else                      quizPool = alle;
+  if (quizPool.length === 0) { updateStartScreen(); return; }
+  current = 0;
+  score = 0;
+  document.getElementById('quizScore').textContent = '0';
+  document.getElementById('quizStart').style.display = 'none';
+  document.getElementById('quizResult').style.display = 'none';
+  document.getElementById('quizPlay').style.display = 'block';
+  showQuestion();
+}
+
+function resetFortschritt() {
+  speichereFortschritt({ answers: {}, gesehen: [] });
+  updateStartScreen();
+  /* NEU-Badges wiederherstellen */
+  NEUE_THEMEN.forEach(function(id) {
+    const sec = document.getElementById(id);
+    if (!sec || sec.querySelector('.new-badge')) return;
+    const btn = sec.querySelector('.topic-btn');
+    if (!btn) return;
+    const b = document.createElement('span');
+    b.className = 'new-badge';
+    b.textContent = 'NEU';
+    btn.insertBefore(b, btn.firstChild);
+  });
+}
+
+function updateStartScreen() {
+  const f = ladeFortschritt();
+  const geloest = Object.keys(f.answers).filter(function(k) { return f.answers[k] === 'ok'; }).length;
+  const nNeu = questions.filter(function(q) { return q.neu; }).length;
+  const offen = questions.length - geloest;
+  document.getElementById('btnAll').textContent = '📋 Alle Fragen (' + questions.length + ')';
+  document.getElementById('btnNew').textContent = '🆕 Nur die neuen Fragen (' + nNeu + ')';
+  document.getElementById('btnOpen').textContent = '🔄 Offene Fragen üben (' + offen + ')';
+  document.getElementById('btnNew').disabled = (nNeu === 0);
+  document.getElementById('btnOpen').disabled = (offen === 0);
+  document.getElementById('btnOpen').title = (offen === 0) ? 'Du hast bisher alle Fragen richtig gelöst!' : '';
+  document.getElementById('progressLine').textContent =
+    geloest > 0
+    ? '✅ Dein Fortschritt: ' + geloest + ' von ' + questions.length + ' Fragen richtig gelöst' + (offen > 0 ? ' – weiter geht’s!' : ' – komplett!')
+    : 'Noch kein gespeicherter Fortschritt auf diesem Gerät. Leg los!';
+}
+
+function restartQuiz() {
+  current = 0;
+  score = 0;
+  document.getElementById('quizScore').textContent = '0';
+  document.getElementById('quizPlay').style.display = 'none';
+  document.getElementById('quizResult').style.display = 'none';
+  updateStartScreen();
+  document.getElementById('quizStart').style.display = 'block';
+}
+
+/* ---------- NEU-Badges automatisch an die Kapitel-Buttons ----------
+   Das Badge verschwindet, sobald der/die Schueler:in das Kapitel einmal
+   aufgemacht hat (pro Geraet gespeichert). */
+NEUE_THEMEN.forEach(function(id) {
+  const sec = document.getElementById(id);
+  if (!sec) return;
+  if (ladeFortschritt().gesehen.indexOf(id) !== -1) return;   // schon gesehen
+  const btn = sec.querySelector('.topic-btn');
+  if (btn && !btn.querySelector('.new-badge')) {
+    const b = document.createElement('span');
+    b.className = 'new-badge';
+    b.textContent = 'NEU';
+    btn.insertBefore(b, btn.firstChild);
+  }
+});
+
+updateStartScreen();
+</script>
+</body>
+</html>

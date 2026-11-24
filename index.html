@@ -398,6 +398,45 @@
     </div>
   </section>
 
+  <!-- Lern-Beispiel zwischen Lektion 04 und 05: abfrage-schleife.php -->
+  <section class="topic" id="demo_abfrage_schleife">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">04+</span>
+      Lern-Beispiel: Schleife + Abfrage kombinieren (Modulo)
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Lern-Beispiel aus dem Unterricht (abfrage-schleife.php):</strong>
+         26 Blöcke mit Überschrift und Text – und nach <strong>jedem zweiten Block</strong> soll ein
+         zusätzliches <code>&lt;hr&gt;</code> ausgegeben werden. Dafür kombinieren wir erstmals
+         <strong>Schleife + Abfrage</strong> – und lernen dabei den Modulo-Operator kennen.</p>
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> abfrage-schleife.php – die flexible Variante</div>
+<pre><span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">26</span>; <span class="var">$i</span>++) {
+    <span class="fn">echo</span> <span class="str">"&lt;b&gt;Überschrift vom Block $i&lt;/b&gt;
+    &lt;br&gt;
+    &lt;em&gt;Ich bin ein Text vom Block&lt;/em&gt;
+    &lt;hr&gt;"</span>;
+
+    <span class="cmt">// nach jedem zweiten Block ein &lt;hr&gt; zusätzlich ausgeben</span>
+    <span class="cmt">// Lösungsvariante 2 (eher flexibel)</span>
+    <span class="cmt">// Modulo (%-Zeichen) ergibt den Rest einer Division</span>
+    <span class="kw">if</span> (<span class="var">$i</span> % <span class="num">2</span> == <span class="num">0</span>) {
+        <span class="fn">echo</span> <span class="str">"&lt;hr&gt;"</span>;
+    }
+}</pre>
+      </div>
+      <p>Im Unterricht haben wir auch die <strong>Variante 1</strong> besprochen: für jede gerade Zahl eine
+         eigene if-Abfrage (<code>if ($i==2) ... if ($i==4) ... if ($i==6) ...</code>) –
+         das funktioniert, ist aber <em>„nicht sehr flexibel“</em>: Bei 26 Blöcken bräuchtest du 13 Abfragen,
+         und bei jeder Änderung der Blockzahl müsstest du alle anpassen.</p>
+      <div class="merke"><b>Merke dir:</b> <code>$i % 2</code> ist der <strong>Modulo-Operator</strong> –
+        er liefert den <b>Rest der Division</b>. Gerade Zahlen haben Rest 0, ungerade Rest 1.
+        Mit einer einzigen if-Abfrage regelst du <em>alle</em> Fälle – dieselbe Technik wie bei den
+        Quadratkarten und in Lektion 06!</div>
+    </div>
+  </section>
+
   <section class="topic" id="thema5">
     <button class="topic-btn" onclick="toggleTopic(this)">
       <span class="topic-num">05</span>
@@ -1076,7 +1115,7 @@
          gerade → <code>&lt;div class='card even'&gt;</code>, ungerade → <code>&lt;div class='card odd'&gt;</code>.</p>
       <div class="merke"><b>Tipp:</b> Gerade/ungerade prüfst du mit <strong>Modulo</strong>:
         <code>$i % 2 == 0</code> heißt „durch 2 teilbar“. Das ist die flexible Variante –
-        statt für jede Zahl eine eigene if-Abfrage zu schreiben (siehe Demo-Karte unten!).</div>
+        statt für jede Zahl eine eigene if-Abfrage zu schreiben (siehe Lern-Beispiel zwischen Lektion 04 und 05!).</div>
       <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
       <div class="solution"><div class="code-window">
         <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> quadratkarten_schritt1.php – Kernidee</div>
@@ -1269,46 +1308,6 @@ elseif ( <span class="fn">isset</span>(<span class="var">$_COOKIE</span>[<span c
     <span class="html-tag">&lt;/body&gt;</span>
 <span class="html-tag">&lt;/html&gt;</span></pre>
       </div></div>
-    </div>
-  </section>
-
-
-  <!-- Demo: Abfrage & Schleife -->
-  <section class="topic">
-    <button class="topic-btn" onclick="toggleTopic(this)">
-      <span class="topic-num">🧩</span>
-      Demo: Abfrage &amp; Schleife kombinieren
-      <span class="arrow">▼</span>
-    </button>
-    <div class="topic-body">
-      <p><strong>Lern-Beispiel aus dem Unterricht (abfrage-schleife.php):</strong>
-         26 Blöcke mit Überschrift und Text – und nach <strong>jedem zweiten Block</strong> soll ein
-         zusätzliches <code>&lt;hr&gt;</code> ausgegeben werden. Dafür kombinieren wir erstmals
-         <strong>Schleife + Abfrage</strong> – und lernen dabei den Modulo-Operator kennen.</p>
-      <div class="code-window">
-        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> abfrage-schleife.php – die flexible Variante</div>
-<pre><span class="kw">for</span> (<span class="var">$i</span>=<span class="num">1</span>; <span class="var">$i</span>&lt;=<span class="num">26</span>; <span class="var">$i</span>++) {
-    <span class="fn">echo</span> <span class="str">"&lt;b&gt;Überschrift vom Block $i&lt;/b&gt;
-    &lt;br&gt;
-    &lt;em&gt;Ich bin ein Text vom Block&lt;/em&gt;
-    &lt;hr&gt;"</span>;
-
-    <span class="cmt">// nach jedem zweiten Block ein &lt;hr&gt; zusätzlich ausgeben</span>
-    <span class="cmt">// Lösungsvariante 2 (eher flexibel)</span>
-    <span class="cmt">// Modulo (%-Zeichen) ergibt den Rest einer Division</span>
-    <span class="kw">if</span> (<span class="var">$i</span> % <span class="num">2</span> == <span class="num">0</span>) {
-        <span class="fn">echo</span> <span class="str">"&lt;hr&gt;"</span>;
-    }
-}</pre>
-      </div>
-      <p>Im Unterricht haben wir auch die <strong>Variante 1</strong> besprochen: für jede gerade Zahl eine
-         eigene if-Abfrage (<code>if ($i==2) ... if ($i==4) ... if ($i==6) ...</code>) –
-         das funktioniert, ist aber <em>„nicht sehr flexibel“</em>: Bei 26 Blöcken bräuchtest du 13 Abfragen,
-         und bei jeder Änderung der Blockzahl müsstest du alle anpassen.</p>
-      <div class="merke"><b>Merke dir:</b> <code>$i % 2</code> ist der <strong>Modulo-Operator</strong> –
-        er liefert den <b>Rest der Division</b>. Gerade Zahlen haben Rest 0, ungerade Rest 1.
-        Mit einer einzigen if-Abfrage regelst du <em>alle</em> Fälle – dieselbe Technik wie bei den
-        Quadratkarten und in Lektion 06!</div>
     </div>
   </section>
 

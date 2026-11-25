@@ -221,7 +221,7 @@
     <h1>Hallo <span>PHP-Entwickler:in</span>! 👋</h1>
     <p>Hier lernst du Schritt für Schritt, wie du mit PHP dynamische Webseiten erstellst –
        von der ersten Ausgabe bis zur eigenen Schleife im HTML. Klicke auf ein Thema, um loszulegen!</p>
-    <span class="badge">💻 Die Nummern entsprechen unseren Unterrichtsdateien (01–11)</span>
+    <span class="badge">💻 Die Nummern entsprechen unseren Unterrichtsdateien (01–12)</span>
   </div>
 </header>
 
@@ -230,7 +230,7 @@
   <p class="intro-text">
     PHP läuft auf dem <strong>Server</strong> und erzeugt HTML, das im Browser ankommt.
     Während HTML nur <strong>statisch</strong> ist (jeder sieht dasselbe), kann PHP Inhalte
-    <strong>dynamisch</strong> berechnen. Die Themen hier folgen genau unseren Unterrichtsdateien <code>01_first.php</code> bis <code>11_zufallszahlen.php</code> – schau sie dir parallel an!
+    <strong>dynamisch</strong> berechnen. Die Themen hier folgen genau unseren Unterrichtsdateien <code>01_first.php</code> bis <code>11_zufallszahlen.php</code> – plus den beiden Dateien im Ordner <code>12_formular-action</code>. Schau sie dir parallel an!
   </p>
 
   <section class="topic" id="thema1">
@@ -751,9 +751,74 @@
     </div>
   </section>
 
+  <!-- ============ THEMA 12: 12_formular-action ============ -->
+  <section class="topic" id="thema12">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">12</span>
+      Formular an eine eigene Seite schicken: action
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p>Bis jetzt hat jedes Formular seine Daten <strong>an sich selbst</strong> geschickt. Jetzt machen wir es wie die Profis: <strong>zwei Dateien</strong> – eine HTML-Seite mit dem Formular und eine eigene PHP-Seite, die die Daten auswertet. Dafür sorgt das <code>action</code>-Attribut. Beide Dateien liegen bei uns im Ordner <code>12_formular-action</code>.</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 12_formular-action/action_eingabe.html</div>
+<pre><span class="html-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="html-tag">&lt;html lang="en"&gt;</span>
+<span class="html-tag">&lt;head&gt;</span>
+    <span class="html-tag">&lt;meta charset="UTF-8"&gt;</span>
+    <span class="html-tag">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>
+    <span class="html-tag">&lt;title&gt;</span>Formular Eingabe<span class="html-tag">&lt;/title&gt;</span>
+<span class="html-tag">&lt;/head&gt;</span>
+<span class="html-tag">&lt;body&gt;</span>
+    <span class="html-tag">&lt;form method="POST" action="action_auswertung.php"&gt;</span>
+        <span class="html-tag">&lt;input name="eingabe" placeholder="Gib was ein"&gt;</span>
+        <span class="html-tag">&lt;button&gt;</span>Abschicken<span class="html-tag">&lt;/button&gt;</span>
+    <span class="html-tag">&lt;/form&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+      </div>
+
+      <p><strong>Und so sieht die Auswertungsseite aus</strong> (<code>action_auswertung.php</code>) – ruf sie ruhig auch mal <em>direkt</em> im Browser auf:</p>
+
+
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> 12_formular-action/action_auswertung.php</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="cmt">// action_auswertung.php</span>
+
+<span class="cmt">// Die Formulardaten kommen aus action_eingabe.html</span>
+
+<span class="kw">if</span> (<span class="var">$_POST</span>) { <span class="cmt">// &lt;- gibt es ueberhaupt POST Formulardaten?</span>
+    <span class="var">$eingabe</span> = <span class="var">$_POST</span>[<span class="str">"eingabe"</span>];
+    <span class="fn">echo</span> <span class="str">"Die Eingabe im Formular war: $eingabe"</span>;
+}
+<span class="kw">else</span> {
+    <span class="fn">echo</span> <span class="str">"Keine Daten empfangen...&lt;br&gt;"</span>;
+    <span class="fn">echo</span> <span class="str">"&lt;a href='action_eingabe.html'&gt;Zur Eingabe&lt;/a&gt;"</span>;
+}
+
+<span class="kw">?&gt;</span></pre>
+      </div>
+
+      <h3>🔍 Was du hier lernst</h3>
+      <ul>
+        <li><code>action="action_auswertung.php"</code>: Das Formular schickt seine Daten <strong>an eine andere Datei</strong> – die Eingabeseite bleibt dabei unverändert stehen</li>
+        <li>Die PHP-Seite kann <strong>alleine aufgerufen</strong> werden (z. B. per Link) – deshalb der <code>if ($_POST)</code>-Check mit dem <code>else</code>-Zweig</li>
+        <li>Der <code>else</code>-Zweig ist der <strong>freundliche Plan B</strong>: „Keine Daten empfangen...“ plus ein Link zurück zur Eingabe – keine Fehlermeldung, kein toter Endpunkt</li>
+        <li>Wird das Formular abgeschickt, liegen alle Daten (wie gewohnt) in <code>$_POST["eingabe"]</code></li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> Mit <strong>action</strong> trennst du Eingabe und Auswertung in <strong>zwei Dateien</strong> – genau so baust du in <strong>UE_06 (Umfrage mit Bestätigungsseite)</strong> dein Umfrageformular und in der <strong>Rabatt-Übung</strong> weiter unten.</div>
+
+      <div class="aufgabe"><b>✏️ Deine Aufgabe:</b> Erweitere <code>action_eingabe.html</code> um ein zweites Feld (z. B. „Alter“) und gib auf der Auswertungsseite einen schönen Satz mit beiden Angaben aus.</div>
+    </div>
+  </section>
+
   <!-- ============ SPICKZETTEL ============ -->
   <h2 class="section-title">📋 PHP-Spickzettel</h2>
-  <p class="section-sub">Die wichtigsten Befehle aus den Lektionen 01–11 – zum Lernen und Nachschlagen.</p>
+  <p class="section-sub">Die wichtigsten Befehle aus den Lektionen 01–12 – zum Lernen und Nachschlagen.</p>
 
   <table class="cheat-table">
     <tr><th>Syntax</th><th>Bedeutung</th></tr>
@@ -779,6 +844,8 @@
     <tr><td><code>&lt;input type="radio" name="x"&gt;</code></td><td>Auswahl: gleiches name = eine Gruppe, nur eine wählbar</td></tr>
     <tr><td><code>value="&lt;?php echo $var;?&gt;"</code></td><td>Formularfeld nach dem Abschicken vorausfüllen (Prefill)</td></tr>
     <tr><td><code>if ($_POST) / if ($_GET)</code></td><td>Kurzprüfung: wurde das Formular abgeschickt?</td></tr>
+    <tr><td><code>&lt;form action=&quot;datei.php&quot;&gt;</code></td><td>Formular an eine eigene Seite schicken (Lektion 12)</td></tr>
+    <tr><td><code>&lt;input type=&quot;checkbox&quot;&gt;</code></td><td>Angehackt: value wird geschickt – nicht angehackt: gar nichts!</td></tr>
   </table>
 
   <!-- ============ ÜBUNGSAUFGABEN ============ -->
@@ -1085,9 +1152,129 @@
     </div>
   </section>
 
+  <!-- UE_06 Umfrageformular mit Bestätigungsseite -->
+  <section class="topic" id="ue_umfrage">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">UE6</span>
+      UE_06: Umfrageformular mit Bestätigungsseite
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Aufgabe (UE_06):</strong> Erstelle eine Umfrage in <strong>zwei Dateien</strong> –
+         genau wie in <b>Lektion 12</b>:</p>
+      <ul>
+        <li><strong>a)</strong> Eine <code>.html</code>-Seite mit dem Umfrageformular: Vorname, Nachname und
+            Wohnort (Textfelder), „Wie wohnen Sie?“ (Radio-Gruppe: Einfamilienhaus / Eigentumswohnung /
+            Mehrfamilienhaus), „Welche TV-Sendungen sehen Sie gern?“ (Checkboxen: Dokumentationen /
+            Nachrichten / Spielfilme / Sport), eine Nachricht (<code>&lt;textarea&gt;</code>) und ein Button
+            „Daten speichern“. Das Design kannst du frei gestalten!</li>
+        <li><strong>b)</strong> Eine eigene <code>.php</code>-Datei, die nach dem Abschicken eine
+            <strong>Bestätigungsseite</strong> zeigt: „Vielen Dank für die Teilnahme an unserer Umfrage“ –
+            mit allen übermittelten Daten darunter.</li>
+      </ul>
+      <div class="merke"><b>Tipp:</b> Im <code>&lt;form&gt;</code>-Tag deiner HTML-Seite brauchst du das
+        Attribut <code>action</code>, das auf die PHP-Seite verweist – z. B.
+        <code>&lt;form method="post" action="bestaetigung.php"&gt;</code>. Auf der PHP-Seite
+        findest du alle eingegebenen Daten in <code>$_POST</code> wieder (Hint in der Aufgabenstellung:
+        Infos zu Formulartypen gibt es auf w3schools.com/html/html_forms.asp).</div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution"><div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> umfrage.html + bestaetigung.php – Kernidee</div>
+<pre><span class="cmt">&lt;!-- umfrage.html: Formular mit action --&gt;</span>
+<span class="html-tag">&lt;form</span> method=<span class="str">"post"</span> action=<span class="str">"bestaetigung.php"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;input</span> name=<span class="str">"vorname"</span><span class="html-tag">&gt;</span> <span class="html-tag">&lt;input</span> name=<span class="str">"nachname"</span><span class="html-tag">&gt;</span> <span class="html-tag">&lt;input</span> name=<span class="str">"ort"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;input</span> type=<span class="str">"radio"</span> name=<span class="str">"wohnung"</span> value=<span class="str">"Einfamilienhaus"</span><span class="html-tag">&gt;</span>
+    <span class="cmt">&lt;!-- Checkboxen: JEDE bekommt ihren eigenen Namen --&gt;</span>
+    <span class="html-tag">&lt;input</span> type=<span class="str">"checkbox"</span> name=<span class="str">"tv_doku"</span> value=<span class="str">"ja"</span><span class="html-tag">&gt;</span> Dokumentationen
+    <span class="html-tag">&lt;input</span> type=<span class="str">"checkbox"</span> name=<span class="str">"tv_news"</span> value=<span class="str">"ja"</span><span class="html-tag">&gt;</span> Nachrichten
+    <span class="html-tag">&lt;input</span> type=<span class="str">"checkbox"</span> name=<span class="str">"tv_filme"</span> value=<span class="str">"ja"</span><span class="html-tag">&gt;</span> Spielfilme
+    <span class="html-tag">&lt;input</span> type=<span class="str">"checkbox"</span> name=<span class="str">"tv_sport"</span> value=<span class="str">"ja"</span><span class="html-tag">&gt;</span> Sport
+    <span class="html-tag">&lt;textarea</span> name=<span class="str">"nachricht"</span><span class="html-tag">&gt;&lt;/textarea&gt;</span>
+    <span class="html-tag">&lt;button&gt;</span>Daten speichern<span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span>
+
+<span class="cmt">&lt;!-- bestaetigung.php: Auswertung --&gt;</span>
+<span class="kw">&lt;?php</span>
+<span class="var">$vorname</span> = <span class="var">$_POST</span>[<span class="str">"vorname"</span>];
+<span class="fn">echo</span> <span class="str">"Vielen Dank für die Teilnahme an unserer Umfrage!&lt;br&gt;"</span>;
+<span class="fn">echo</span> <span class="str">"Vorname: $vorname&lt;br&gt;"</span>;
+<span class="fn">echo</span> <span class="str">"Wohnung: "</span> . <span class="var">$_POST</span>[<span class="str">"wohnung"</span>] . <span class="str">"&lt;br&gt;"</span>;
+<span class="fn">echo</span> <span class="str">"Beliebte TV-Sendungen: "</span>;
+<span class="kw">if</span> ( <span class="fn">isset</span>(<span class="var">$_POST</span>[<span class="str">"tv_doku"</span>])) <span class="fn">echo</span> <span class="str">"Dokumentationen "</span>;
+<span class="kw">if</span> ( <span class="fn">isset</span>(<span class="var">$_POST</span>[<span class="str">"tv_news"</span>])) <span class="fn">echo</span> <span class="str">"Nachrichten "</span>;
+<span class="kw">if</span> ( <span class="fn">isset</span>(<span class="var">$_POST</span>[<span class="str">"tv_filme"</span>])) <span class="fn">echo</span> <span class="str">"Spielfilme "</span>;
+<span class="kw">if</span> ( <span class="fn">isset</span>(<span class="var">$_POST</span>[<span class="str">"tv_sport"</span>])) <span class="fn">echo</span> <span class="str">"Sport"</span>;
+<span class="fn">echo</span> <span class="str">"&lt;br&gt;Nachricht: "</span> . <span class="var">$_POST</span>[<span class="str">"nachricht"</span>];
+<span class="kw">?&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- UE Rabatt: Rabatt-Tabelle per Formular -->
+  <section class="topic" id="ue_rabatt">
+    <button class="topic-btn" onclick="toggleTopic(this)">
+      <span class="topic-num">€</span>
+      UE Rabatt: Rabatt-Tabelle per Formular (rabatt_vorlage.php)
+      <span class="arrow">▼</span>
+    </button>
+    <div class="topic-body">
+      <p><strong>Übung (rabatt_vorlage.php):</strong> Erweitere die Vorlage <code>rabatt_vorlage.php</code> so, dass der <strong>Grundpreis</strong> und der <strong>maximale Rabatt</strong> über ein Formular eingegeben werden können. Die Schleife funktioniert schon – schau sie dir an und versuche, sie zu verstehen!</p>
+
+      <h3>🔍 Schritt 1 – HTML: Formular erweitern</h3>
+      <ul>
+        <li>Eingabefeld für den Grundpreis (z. B. <code>name="basePrice"</code>)</li>
+        <li>Eingabefeld für den maximalen Rabatt in % (z. B. <code>name="maxDiscount"</code>)</li>
+        <li>Submit-Button (z. B. „Rabatt-Tabelle berechnen“)</li>
+      </ul>
+
+      <h3>🔍 Schritt 2 – PHP: Formular auslesen</h3>
+      <ul>
+        <li><code>$basePrice</code> aus dem Eingabefeld „Grundpreis“ lesen</li>
+        <li><code>$maxDiscount</code> aus dem Eingabefeld „maximaler Rabatt“ lesen</li>
+        <li>Die Schleife (5%-Schritte bis zum maximalen Rabatt) funktioniert schon – <strong>nicht anfassen, verstehen!</strong></li>
+      </ul>
+
+      <div class="merke"><b>Merke dir:</b> <b>Tipp:</b> Das Muster kennst du aus <b>Lektion 07/09/10</b>: <code>if ($_POST)</code> prüft, ob abgeschickt wurde (sonst gelten die Defaults 100 € / 50 %) – und <code>$x += 5</code> ist die Verwandte von <code>$i++</code>: statt +1 wird +5 pro Durchlauf gezählt. Musterlösung (nur Schulnetz): <code>webserver.ferrarischule.at/beispiele/rabatt/rabatt.php</code></div>
+      <button class="solution-btn" onclick="toggleSolution(this)">💡 Lösung anzeigen</button>
+      <div class="solution">
+      <div class="code-window">
+        <div class="code-title"><span class="dots"><i></i><i></i><i></i></span> rabatt_vorlage.php – Kernidee</div>
+<pre><span class="kw">&lt;?php</span>
+<span class="var">$basePrice</span>  = <span class="num">100</span>;  <span class="cmt">// Grundpreis in Euro (Default)</span>
+<span class="var">$maxDiscount</span> = <span class="num">50</span>;  <span class="cmt">// maximaler Rabatt in Prozent (Default)</span>
+
+<span class="kw">if</span> (<span class="var">$_POST</span>) {    <span class="cmt">// wurde das Formular abgeschickt?</span>
+    <span class="var">$basePrice</span>   = <span class="var">$_POST</span>[<span class="str">"basePrice"</span>];
+    <span class="var">$maxDiscount</span> = <span class="var">$_POST</span>[<span class="str">"maxDiscount"</span>];
+}
+<span class="kw">?&gt;</span>
+<span class="html-tag">&lt;h1&gt;</span>Rabatt-Tabelle<span class="html-tag">&lt;/h1&gt;</span>
+
+<span class="html-tag">&lt;form method="post"&gt;</span>
+    <span class="html-tag">&lt;label&gt;</span>Grundpreis in Euro:
+        <span class="html-tag">&lt;input type="number" name="basePrice"&gt;</span><span class="html-tag">&lt;/label&gt;</span>
+    <span class="html-tag">&lt;label&gt;</span>Maximaler Rabatt in %:
+        <span class="html-tag">&lt;input type="number" name="maxDiscount"&gt;</span><span class="html-tag">&lt;/label&gt;</span>
+    <span class="html-tag">&lt;input type="submit" value="Rabatt-Tabelle berechnen"&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span>
+
+<span class="cmt">&lt;!-- die Schleife bleibt unberuehrt: --&gt;</span>
+<span class="kw">&lt;?php</span>
+<span class="kw">for</span> (<span class="var">$discount</span> = <span class="num">5</span>; <span class="var">$discount</span> &lt;= <span class="var">$maxDiscount</span>; <span class="var">$discount</span> += <span class="num">5</span>) {
+    <span class="var">$saving</span>   = <span class="var">$basePrice</span> * <span class="var">$discount</span> / <span class="num">100</span>;
+    <span class="var">$newPrice</span> = <span class="var">$basePrice</span> - <span class="var">$saving</span>;
+    <span class="fn">echo</span> <span class="str">"&lt;tr&gt;&lt;td&gt; $discount %&lt;/td&gt;"</span>;
+    <span class="fn">echo</span> <span class="str">"&lt;td&gt; $saving &amp;euro;&lt;/td&gt;"</span>;
+    <span class="fn">echo</span> <span class="str">"&lt;td&gt; $newPrice &amp;euro;&lt;/td&gt;&lt;/tr&gt;"</span>;
+}
+<span class="kw">?&gt;</span></pre>
+      </div></div>
+    </div>
+  </section>
+
   <!-- ============ QUIZ ============ -->
   <h2 class="section-title">🧠 Quiz: Bist du bereit?</h2>
-  <p class="section-sub">16 Fragen zu den Lektionen 01–11. Beim Start kannst du wählen: alle Fragen – oder nur die neuen (passend zu den 🆕-markierten Themen). Überlege gut, du kannst jede Frage nur einmal beantworten!</p>
+  <p class="section-sub">20 Fragen zu den Lektionen 01–12. Beim Start kannst du wählen: alle Fragen – oder nur die neuen (passend zu den 🆕-markierten Themen: Lektion 12 &amp; die neuen Übungen). Überlege gut, du kannst jede Frage nur einmal beantworten!</p>
 
   <div class="quiz-card" id="quiz">
     <div class="quiz-progress"><div class="bar" id="quizBar"></div></div>
@@ -1261,6 +1448,35 @@ const questions = [
     correct: 0,
     explain: "Radio-Buttons mit demselben name-Attribut bilden eine Gruppe – der Browser erlaubt nur eine Auswahl, und der gewählte value landet in $_POST[\"hobby\"]."
   }
+,
+  {
+    q: "Wofür sorgt das action-Attribut im Formular von action_eingabe.html?",
+    neu: true,
+    answers: ["Das Formular schickt seine Daten an die Datei action_auswertung.php", "Die Datei action_auswertung.php öffnet sich sofort beim Laden der Seite", "Die Eingaben werden an eine E-Mail-Adresse geschickt", "Das Formular wird nach dem Abschicken geleert"],
+    correct: 0,
+    explain: "action legt das Ziel fest: Die HTML-Seite zeigt das Formular, die Angaben werden an die .php-Datei geschickt, die sie auswertet – Eingabe und Auswertung in zwei Dateien (Lektion 12)."
+  },
+  {
+    q: "Du rufst action_auswertung.php direkt im Browser auf, ohne das Formular abzuschicken. Was erscheint?",
+    neu: true,
+    answers: ["Die Eingabe im Formular war: ...", "Eine PHP-Fehlermeldung", "Eine komplett leere Seite", "Keine Daten empfangen... + der Link zur Eingabe"],
+    correct: 3,
+    explain: "if ($_POST) ist falsch, deshalb läuft der else-Zweig: freundliche Meldung und ein Link zurück zu action_eingabe.html – gute Seiten halten immer einen Plan B bereit."
+  },
+  {
+    q: "Nach dem Abschicken von action_eingabe.html – wo findest du die Eingabe auf der Auswertungsseite?",
+    neu: true,
+    answers: ["In $_GET, weil das Formular eine HTML-Datei ist", "In $action, dem Ziel des Formulars", "In $_POST, weil das Formular method POST hat", "Direkt im action-Attribut der URL"],
+    correct: 2,
+    explain: 'method="POST" legt den Transportweg fest – also liegen die Daten (wie in Lektion 07) in der Superglobalen $_POST[\"eingabe\"], unter dem name-Attribut des Eingabefelds.'
+  },
+  {
+    q: "Was passiert in der Rabatt-UE, wenn noch niemand auf den Berechnen-Button geklickt hat?",
+    neu: true,
+    answers: ["Die Seite bleibt komplett leer", "Die Tabelle wird mit den Default-Werten (100 € Grundpreis, max. 50 % Rabatt) berechnet", "Es erscheint eine PHP-Fehlermeldung", "PHP bricht die Schleife ab"],
+    correct: 1,
+    explain: "if ($_POST) ist falsch, deshalb gelten die Defaults $basePrice = 100 und $maxDiscount = 50 – genau dieses Muster (Defaults setzen und nach dem Abschicken überschreiben) kennst du schon von den Quadratkarten, Schritt 2."
+  }
 ];
 
 /* ================================================================
@@ -1272,9 +1488,9 @@ const questions = [
    Kapitel einmal aufgemacht wurde (localStorage, siehe toggleTopic).
    Neue Quiz-Fragen markierst du mit  neu: true  – sie erscheinen
    dann im Modus "Nur die neuen Fragen".
-   Aktuell neu: nichts – die Liste ist leer. Sobald Inhalte dazukommen ('thema12' bei einer 12. Lektion, 'ue_xyz' bei neuen Uebungen), hier eintragen.
+   Aktuell neu: Lektion 12 formular-action ('thema12'), UE_06 Umfrage ('ue_umfrage') und UE Rabatt ('ue_rabatt').
    ================================================================ */
-const NEUE_THEMEN = [];
+const NEUE_THEMEN = ['thema12', 'ue_umfrage', 'ue_rabatt'];
 
 let quizPool = questions;
 let current = 0;
@@ -1357,7 +1573,7 @@ function showResult() {
   document.getElementById('resultScore').textContent = score + ' / ' + quizPool.length;
   const ratio = score / quizPool.length;
   let emoji, title, text;
-  if (ratio === 1) { emoji = '🏆'; title = 'Perfekt!'; text = 'Du kennst die Lektionen 01–11 in und auswendig. Bereit für das nächste Projekt!'; }
+  if (ratio === 1) { emoji = '🏆'; title = 'Perfekt!'; text = 'Du kennst die Lektionen 01–12 in und auswendig. Bereit für das nächste Projekt!'; }
   else if (ratio >= 0.7) { emoji = '🎉'; title = 'Super gemacht!'; text = 'Du hast die Grundlagen drauf. Schau dir noch einmal die Themen an, bei denen du unsicher warst.'; }
   else if (ratio >= 0.4) { emoji = '💪'; title = 'Guter Anfang!'; text = 'Wiederhole die Themen und versuche es noch einmal – Übung macht den Meister.'; }
   else { emoji = '📚'; title = 'Nochmal üben!'; text = 'Klappe die Themen oben noch einmal auf und arbeite die Code-Beispiele selbst nach. Dann klappt es beim nächsten Mal!'; }
